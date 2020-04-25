@@ -24,26 +24,26 @@ typedef enum ElectionResult_t {
 
 typedef bool (*AreaConditionFunction) (int);
 
-Election electionCreate();
+Election electionCreate(); //Ron
 
-void electionDestroy(Election election);
+void electionDestroy(Election election); //Ron
 
-ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name);
+ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name); //Ron
 
-ElectionResult electionAddArea(Election election, int area_id, const char* area_name);
+ElectionResult electionAddArea(Election election, int area_id, const char* area_name); //Ron
 
-char* electionGetTribeName (Election election, int tribe_id);
+char* electionGetTribeName (Election election, int tribe_id); //Ron
 
-ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes);
+ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes); //Itay
 
-ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes);
+ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes); //Itay
 
-ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name);
+ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name); //Ron
 
-ElectionResult electionRemoveTribe (Election election, int tribe_id);
+ElectionResult electionRemoveTribe (Election election, int tribe_id); //Seperate to static func
 
-ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area);
+ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area); //Seperate to static func
 
-Map electionComputeAreasToTribesMapping (Election election);
+Map electionComputeAreasToTribesMapping (Election election); //Itay
 
 #endif //MTM_ELECTION_H
