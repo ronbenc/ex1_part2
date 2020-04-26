@@ -52,6 +52,15 @@ static int getIntLength(int num)
     return len;
 }
 
+//converts an integer into a new allocated string
+static char* intToString(int num)
+{
+    char* str_num = malloc(getIntLength(num) + 1);
+    if(str_num == NULL)
+        return NULL;
+    sprintf(str_num, "%d", num);
+    return str_num;
+}
 
 
 Election electionCreate() //Ron
@@ -79,11 +88,8 @@ ElectionResult electionAddTribe (Election election, int tribe_id, const char* tr
     if(!isIdValid(tribe_id))
         return ELECTION_INVALID_ID;
     
-    char* str_tribe_id = malloc(getIntLength(tribe_id) + 1);
     if(str_tribe_id == NULL)
         return ELECTION_OUT_OF_MEMORY;
-
-    sprintf(str_tribe_id, "%d", tribe_id);
 
     if(mapContains(election->tribes, str_tribe_id))
         return ELECTION_TRIBE_ALREADY_EXIST;
