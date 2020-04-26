@@ -1,5 +1,6 @@
 #include "election.h"
 #include <stdio.h>
+#include <assert.h>
 
 #define PARTITION_CHAR '_'
 
@@ -17,15 +18,86 @@ static char* votesGetTribeId(char* votes_key);
 
 static char* votesGetAreaId(char* votes_key);
 
-static bool isIdValid(int id);
+//true if id is a positive integer. false otherwise.
+static inline bool isIdValid(int id)
+{
+    return (id>=0);
+}
+
+//true if name contains only lowercase letters and spaces (' '). false otherwise
+static bool isNameValid(char* name)
+{
+    assert(name != NULL);
+    while (name[0] != 0)
+    {
+        if((name < 'a' || name > 'z') && (name != ' '))
+            return false;
+        name++;
+    }
+    
+    return true;
+}
+
+//returns an integer length. will be used in convertion of int to string
+static int getIntLength(int num)
+{
+    assert(isIdValid(num));
+    int len = 0;
+    while (num>0)
+    {
+        num/=10;
+        len++;
+    }
+    
+    return len;
+}
 
 
 
-Election electionCreate(); //Ron
+Election electionCreate() //Ron
+{
+    Election election = malloc(sizeof(*election));
+    if(election == NULL)
+        return NULL;
+    
+    return election;
+}
 
-void electionDestroy(Election election); //Ron
+void electionDestroy(Election election) //Ron
+{
+    mapDestroy(election->tribes);
+    mapDestroy(election->areas);
+    mapDestroy(election->votes);
+    free(election);
+}
 
-ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name); //Ron
+ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
+{
+    if(election == NULL || tribe_id == NULL || tribe_name == NULL)
+        return ELECTION_NULL_ARGUMENT;
+    
+    if(!isIdValid(tribe_id))
+        return ELECTION_INVALID_ID;
+    
+    char* str_tribe_id = malloc(getIntLength(tribe_id) + 1);
+    if(str_tribe_id == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+
+    sprintf(str_tribe_id, "%d", tribe_id);
+
+    if(mapContains(election->tribes, str_tribe_id))
+        return ELECTION_TRIBE_ALREADY_EXIST;
+    
+    if(!isNameValid(tribe_name))
+        return ELECTION_INVALID_NAME;
+    
+
+
+    if(mapPut(election->tribes, str_tribe_id, tribe_name) != MAP_SUCCESS)
+        return ELECTION_OUT_OF_MEMORY;
+    
+    return ELECTION_SUCCESS;
+}
 
 ElectionResult electionAddArea(Election election, int area_id, const char* area_name); //Ron
 

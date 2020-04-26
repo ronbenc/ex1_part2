@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/home/ronbenc/projects/HW1/part2/election.h
+mtm_map/map.h
+C:/home/ronbenc/projects/HW1/part2/mtm_map/map.h
+
+C:/home/ronbenc/projects/HW1/part2/main.c
+stdio.h
+-
+election.h
+C:/home/ronbenc/projects/HW1/part2/election.h
+assert.h
+-
+
+C:/home/ronbenc/projects/HW1/part2/mtm_map/map.h
+stdbool.h
+-
+string.h
+-
+
