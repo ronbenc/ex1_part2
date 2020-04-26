@@ -1,6 +1,8 @@
 #include "election.h"
+#include "map.h"
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #define PARTITION_CHAR '_'
 
@@ -12,11 +14,11 @@ struct election_t
 };
 
 //currently uses strings.
-static char* votesKeyGenerate(char* area_id, char* tribe_id);
+// static char* votesKeyGenerate(char* area_id, char* tribe_id);
 
-static char* votesGetTribeId(char* votes_key);
+// static char* votesGetTribeId(char* votes_key);
 
-static char* votesGetAreaId(char* votes_key);
+// static char* votesGetAreaId(char* votes_key);
 
 //true if id is a positive integer. false otherwise.
 static inline bool isIdValid(int id)
@@ -30,7 +32,7 @@ static bool isNameValid(char* name)
     assert(name != NULL);
     while (name[0] != 0)
     {
-        if((name < 'a' || name > 'z') && (name != ' '))
+        if((name[0] < 'a' || name[0] > 'z') && (name[0] != ' '))
             return false;
         name++;
     }
@@ -82,27 +84,42 @@ void electionDestroy(Election election) //Ron
 
 ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
 {
-    if(election == NULL || tribe_id == NULL || tribe_name == NULL)
+    if(election == NULL || tribe_name == NULL)
         return ELECTION_NULL_ARGUMENT;
     
     if(!isIdValid(tribe_id))
         return ELECTION_INVALID_ID;
     
+    char* str_tribe_id = intToString(tribe_id);
     if(str_tribe_id == NULL)
         return ELECTION_OUT_OF_MEMORY;
-
+    
     if(mapContains(election->tribes, str_tribe_id))
+    {
+        free(str_tribe_id);
         return ELECTION_TRIBE_ALREADY_EXIST;
+    }
     
-    if(!isNameValid(tribe_name))
+    if(!isNameValid(str_tribe_id))
+    {
+        free(str_tribe_id);
         return ELECTION_INVALID_NAME;
-    
+    }
 
+    MapResult tmp_map_result= mapPut(election->tribes, str_tribe_id, tribe_name);
+    assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
 
-    if(mapPut(election->tribes, str_tribe_id, tribe_name) != MAP_SUCCESS)
+    if(tmp_map_result != MAP_SUCCESS)
+    {
+        assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
+        free(str_tribe_id);
         return ELECTION_OUT_OF_MEMORY;
-    
-    return ELECTION_SUCCESS;
+    }
+    else
+    {
+        free(str_tribe_id);
+        return ELECTION_SUCCESS;
+    }
 }
 
 ElectionResult electionAddArea(Election election, int area_id, const char* area_name); //Ron
@@ -113,16 +130,16 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
 
 ElectionResult electionRemoveTribe (Election election, int tribe_id); //Seperate to static func
 
-static void electionRemoveTribeFromTribes(Election election, int tribe_id);
+// static void electionRemoveTribeFromTribes(Election election, int tribe_id);
 
-static void electionRemoveTribeFromVotes(Election election, int tribe_id);
+// static void electionRemoveTribeFromVotes(Election election, int tribe_id);
 
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area); //Seperate to static func
 
-static void electionRemoveAreaFromTribes(Election election, int area_id);
+// static void electionRemoveAreaFromTribes(Election election, int area_id);
 
-static void electionRemoveAreaFromVotes(Election election, int area_id);
+// static void electionRemoveAreaFromVotes(Election election, int area_id);
 
 
 Map electionComputeAreasToTribesMapping (Election election); //Itay

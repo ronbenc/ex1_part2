@@ -139,6 +139,33 @@ election/fast:
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/build
 .PHONY : election/fast
 
+election.obj: election.c.obj
+
+.PHONY : election.obj
+
+# target to build an object file
+election.c.obj:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/election.c.obj
+.PHONY : election.c.obj
+
+election.i: election.c.i
+
+.PHONY : election.i
+
+# target to preprocess a source file
+election.c.i:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/election.c.i
+.PHONY : election.c.i
+
+election.s: election.c.s
+
+.PHONY : election.s
+
+# target to generate assembly for a file
+election.c.s:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/election.c.s
+.PHONY : election.c.s
+
 main.obj: main.c.obj
 
 .PHONY : main.obj
@@ -175,6 +202,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... election
+	@echo ... election.obj
+	@echo ... election.i
+	@echo ... election.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s

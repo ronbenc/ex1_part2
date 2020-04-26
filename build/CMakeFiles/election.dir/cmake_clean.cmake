@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/election.dir/election.c.obj"
   "CMakeFiles/election.dir/main.c.obj"
   "election.exe"
   "election.exe.manifest"
