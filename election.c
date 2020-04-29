@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #define PARTITION_CHAR '_'
+#define NO_VOTES 0
 
 struct election_t
 {
@@ -14,7 +15,7 @@ struct election_t
 };
 
 //currently uses strings.
-// static char* votesKeyGenerate(char* area_id, char* tribe_id);
+
 
 // static char* votesGetTribeId(char* votes_key);
 
@@ -62,6 +63,29 @@ static char* intToString(int num)
         return NULL;
     sprintf(str_num, "%d", num);
     return str_num;
+}
+
+//converts an allocated string into an integer 
+static int stringToInt(const char* str){
+    return atoi(str);
+}
+
+
+//generates a unique key to votes map, which contains area and tribe voted for
+//tests needed
+static char* votesKeyGenerate(char* area_id, char* tribe_id){
+    char partition_char = PARTITION_CHAR;
+    char* ptr = &partition_char;
+    int len = strlen(area_id) + strlen(tribe_id) + 2; //additional partition char & /0
+    char* new_key = malloc(len*sizeof(char));
+    if(new_key == NULL){
+        return NULL;
+    }
+    strcpy(new_key, area_id);
+    strcat(new_key, ptr);
+    strcat(new_key, tribe_id);
+    assert(strlen(new_key) == len);
+    return new_key;
 }
 
 
@@ -144,6 +168,54 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 
 Map electionComputeAreasToTribesMapping (Election election); //Itay
 
-ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes); //Itay
+ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes){
+    //checking input
+    if(!election || !area_id || !tribe_id){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0 || area_id < 0){
+        return ELECTION_INVALID_ID;
+    }
+    if(num_of_votes <= 0){
+        return ELECTION_INVALID_VOTES;
+    }
+    if(!mapContains(election->areas, intToString(area_id))){
+        return ELECTION_AREA_NOT_EXIST;
+    }
+    if(!mapContains(election->tribes, intToString(tribe_id))){
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+
+    char* curr_key = votesKeyGenerate(intToString(area_id), intToString(tribe_id));
+    if(!curr_key){
+        electionDestroy(election);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    assert(election->votes && curr_key && num_of_votes); //supposed to be valid    
+    
+    char* prev_votes = stringToInt(mapContains(election->votes, curr_key)
+                            ? mapGet(election->votes, curr_key) : NO_VOTES);
+    if(!prev_votes){
+        free(curr_key);
+        electionDestroy(election);
+        return ELECTION_OUT_OF_MEMORY;
+    }    
+    
+    char* curr_votes = intToString(max(num_of_votes + stringToInt(prev_votes), NO_VOTES)); //in case a bigger number should be subtracted
+    if(!curr_votes){
+        free(curr_key);
+        electionDestroy(election);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+
+    MapResult mapPutResult = mapPut(election->votes, curr_key, curr_votes);
+    free(curr_key);
+    if(mapPutResult == MAP_NULL_ARGUMENT){
+        electionDestroy(election);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    assert(mapPutResult == MAP_SUCCESS);
+    return ELECTION_SUCCESS;
+}
 
 ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes); //Itay
