@@ -70,6 +70,26 @@ static int stringToInt(const char* str){
     return atoi(str);
 }
 
+//checks if all arguments to electionAddVote are valid
+static ElectionResult argCheck(Election election, int area_id, int tribe_id, int num_of_votes){
+    if(!election || !area_id || !tribe_id){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0 || area_id < 0){
+        return ELECTION_INVALID_ID;
+    }
+    if(num_of_votes <= 0){
+        return ELECTION_INVALID_VOTES;
+    }
+    if(!mapContains(election->areas, intToString(area_id))){
+        return ELECTION_AREA_NOT_EXIST;
+    }
+    if(!mapContains(election->tribes, intToString(tribe_id))){
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+    return ELECTION_SUCCESS;
+}
+
 
 //generates a unique key to votes map, which contains area and tribe voted for
 //tests needed
@@ -169,23 +189,10 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 Map electionComputeAreasToTribesMapping (Election election); //Itay
 
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes){
-    //checking input
-    if(!election || !area_id || !tribe_id){
-        return ELECTION_NULL_ARGUMENT;
+    ElectionResult argCheckResult = argCheck(election, area_id, tribe_id, num_of_votes);
+    if(argCheckResult != ELECTION_SUCCESS){
+        return argCheckResult;
     }
-    if(tribe_id < 0 || area_id < 0){
-        return ELECTION_INVALID_ID;
-    }
-    if(num_of_votes <= 0){
-        return ELECTION_INVALID_VOTES;
-    }
-    if(!mapContains(election->areas, intToString(area_id))){
-        return ELECTION_AREA_NOT_EXIST;
-    }
-    if(!mapContains(election->tribes, intToString(tribe_id))){
-        return ELECTION_TRIBE_NOT_EXIST;
-    }
-
     char* curr_key = votesKeyGenerate(intToString(area_id), intToString(tribe_id));
     if(!curr_key){
         electionDestroy(election);
