@@ -11,8 +11,9 @@ int main()
     electionAddArea(election, 04, "haifa");
     electionAddArea(election, 03, "tel aviv");
 
-    printf("%s\n", electionGetTribeName(election, 01));
-    printf("%s\n", electionGetTribeName(election, 02));
+    electionSetTribeName(election, 01, "meretz!@");
+
+
 
     return 0;
 }
