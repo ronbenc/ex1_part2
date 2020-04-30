@@ -170,7 +170,45 @@ ElectionResult electionAddTribe (Election election, int tribe_id, const char* tr
     }
 }
 
-ElectionResult electionAddArea(Election election, int area_id, const char* area_name); //Ron
+ElectionResult electionAddArea(Election election, int area_id, const char* area_name) //Ron
+{
+    if(election == NULL || area_name == NULL)
+        return ELECTION_NULL_ARGUMENT;
+    
+    if(!isIdValid(area_id))
+        return ELECTION_INVALID_ID;
+    
+    char* str_area_id = intToString(area_id);
+    if(str_area_id == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+    
+    if(mapContains(election->tribes, str_area_id))
+    {
+        free(str_area_id);
+        return ELECTION_TRIBE_ALREADY_EXIST;
+    }
+    
+    if(!isNameValid(area_name))
+    {
+        free(str_area_id);
+        return ELECTION_INVALID_NAME;
+    }
+
+    MapResult tmp_map_result = mapPut(election->areas, str_area_id, area_name);
+    assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
+
+    if(tmp_map_result != MAP_SUCCESS)
+    {
+        assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
+        free(str_area_id);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    else
+    {
+        free(str_area_id);
+        return ELECTION_SUCCESS;
+    }
+}
 
 char* electionGetTribeName (Election election, int tribe_id); //Ron
 
