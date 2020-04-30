@@ -193,6 +193,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/main.c.s
 .PHONY : main.c.s
 
+mtm_map/map.obj: mtm_map/map.c.obj
+
+.PHONY : mtm_map/map.obj
+
+# target to build an object file
+mtm_map/map.c.obj:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/mtm_map/map.c.obj
+.PHONY : mtm_map/map.c.obj
+
+mtm_map/map.i: mtm_map/map.c.i
+
+.PHONY : mtm_map/map.i
+
+# target to preprocess a source file
+mtm_map/map.c.i:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/mtm_map/map.c.i
+.PHONY : mtm_map/map.c.i
+
+mtm_map/map.s: mtm_map/map.c.s
+
+.PHONY : mtm_map/map.s
+
+# target to generate assembly for a file
+mtm_map/map.c.s:
+	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/mtm_map/map.c.s
+.PHONY : mtm_map/map.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -208,6 +235,9 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... mtm_map/map.obj
+	@echo ... mtm_map/map.i
+	@echo ... mtm_map/map.s
 .PHONY : help
 
 

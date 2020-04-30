@@ -1,6 +1,11 @@
 [
 {
   "directory": "C:/home/ronbenc/projects/HW1/part2/build",
+  "command": "C:\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles\\election.dir\\mtm_map\\map.c.obj   -c C:\\home\\ronbenc\\projects\\HW1\\part2\\mtm_map\\map.c",
+  "file": "C:/home/ronbenc/projects/HW1/part2/mtm_map/map.c"
+},
+{
+  "directory": "C:/home/ronbenc/projects/HW1/part2/build",
   "command": "C:\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles\\election.dir\\election.c.obj   -c C:\\home\\ronbenc\\projects\\HW1\\part2\\election.c",
   "file": "C:/home/ronbenc/projects/HW1/part2/election.c"
 },

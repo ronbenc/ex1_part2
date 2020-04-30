@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "C:/home/ronbenc/projects/HW1/part2/election.c" "C:/home/ronbenc/projects/HW1/part2/build/CMakeFiles/election.dir/election.c.obj"
   "C:/home/ronbenc/projects/HW1/part2/main.c" "C:/home/ronbenc/projects/HW1/part2/build/CMakeFiles/election.dir/main.c.obj"
+  "C:/home/ronbenc/projects/HW1/part2/mtm_map/map.c" "C:/home/ronbenc/projects/HW1/part2/build/CMakeFiles/election.dir/mtm_map/map.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 
