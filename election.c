@@ -210,7 +210,23 @@ ElectionResult electionAddArea(Election election, int area_id, const char* area_
     }
 }
 
-char* electionGetTribeName (Election election, int tribe_id); //Ron
+char* electionGetTribeName (Election election, int tribe_id) //Ron
+{
+    if(election == NULL || !isIdValid(tribe_id))
+        return NULL;
+    
+    char* str_tribe_id = intToString(tribe_id);
+    if(str_tribe_id == NULL)
+        return NULL;
+    
+    if(!mapContains(election->tribes, str_tribe_id))
+        return NULL;
+    
+    char* tribe_name = mapGet(election->tribes, str_tribe_id);
+    free(str_tribe_id);
+
+    return tribe_name;
+}
 
 ElectionResult electionSetTribeName (Election election, int tribe_id, const char* tribe_name); //Ron
 
