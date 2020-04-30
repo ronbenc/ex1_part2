@@ -66,9 +66,9 @@ static char* intToString(int num)
 }
 
 //converts an allocated string into an integer 
-// static int stringToInt(const char* str){
-//     return atoi(str);
-// }
+static int stringToInt(const char* str){
+    return atoi(str);
+}
 
 //checks if all arguments to electionAddVote are valid
 // static ElectionResult argCheck(Election election, int area_id, int tribe_id, int num_of_votes){
@@ -265,10 +265,11 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
 }
 
 
-static void electionRemoveTribeFromTribes(Election election, const char* str_tribe_id)
+static void electionRemoveTribeFromTribes(Map tribes, const char* str_tribe_id)
 {
-    assert(election != NULL && election->tribes != NULL);
-    mapRemove(election->tribes, str_tribe_id);
+    assert(tribes != NULL);
+    assert(mapContains(tribes, str_tribe_id));
+    mapRemove(tribes, str_tribe_id);
 }
 
 // static void electionRemoveTribeFromVotes(Election election, int tribe_id);
@@ -291,20 +292,44 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
         return ELECTION_TRIBE_NOT_EXIST;
     }
 
-    electionRemoveTribeFromTribes(election, str_tribe_id);
+    electionRemoveTribeFromTribes(election->tribes, str_tribe_id);
     //electionRemoveTribeFromVotes
 
     return ELECTION_SUCCESS;
 }
 
-
-
-
-ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area); //Seperate to static func
-
-// static void electionRemoveAreaFromTribes(Election election, int area_id);
+static void electionRemoveAreaFromTribes(Map areas, const char* str_area_id)
+{
+    assert(areas != NULL);
+    assert(mapContains(areas, str_area_id));
+    mapRemove(areas, str_area_id);
+}
 
 // static void electionRemoveAreaFromVotes(Election election, int area_id);
+
+
+ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area) //Seperate to static func
+{
+     if(election == NULL || should_delete_area == NULL)
+        return ELECTION_NULL_ARGUMENT;
+    
+    int prev_area_id = -1;
+    MAP_FOREACH(area_id_iterator, election->areas)
+    {
+        int curr_area_id = stringToInt(area_id_iterator);
+        if(should_delete_area(prev_area_id))
+        {
+            electionRemoveAreaFromTribes(election->areas,intToString(prev_area_id));
+            //electionRemoveAreaFromVotes
+        }
+
+        prev_area_id = curr_area_id;
+    }
+
+    //where to implemnt ElECTION_OUT_OF_MEMORY case?
+    return MAP_SUCCESS;
+}
+
 
 
 // Map electionComputeAreasToTribesMapping (Election election); //Itay

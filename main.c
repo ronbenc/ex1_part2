@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include "election.h"
 
+bool remove_func(int area_id)
+{
+    return (area_id == 3);
+    
+}
 
 int main()
 {
@@ -12,7 +17,7 @@ int main()
     electionAddArea(election, 03, "tel aviv");
 
     electionRemoveTribe(election, 02);
-
+    electionRemoveAreas(election, *remove_func);
 
     return 0;
 }
