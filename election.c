@@ -264,11 +264,40 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
     }
 }
 
-ElectionResult electionRemoveTribe (Election election, int tribe_id); //Seperate to static func
 
-// static void electionRemoveTribeFromTribes(Election election, int tribe_id);
+static void electionRemoveTribeFromTribes(Election election, const char* str_tribe_id)
+{
+    assert(election != NULL && election->tribes != NULL);
+    mapRemove(election->tribes, str_tribe_id);
+}
 
 // static void electionRemoveTribeFromVotes(Election election, int tribe_id);
+
+ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate to static func
+{
+    if(election == NULL)
+        return ELECTION_NULL_ARGUMENT;
+
+    if(!isIdValid(tribe_id))
+        return ELECTION_INVALID_ID;
+    
+    char* str_tribe_id = intToString(tribe_id);
+    if(str_tribe_id == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+
+    if(!mapContains(election->tribes, str_tribe_id))
+    {
+        free(str_tribe_id);
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+
+    electionRemoveTribeFromTribes(election, str_tribe_id);
+    //electionRemoveTribeFromVotes
+
+    return ELECTION_SUCCESS;
+}
+
+
 
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area); //Seperate to static func

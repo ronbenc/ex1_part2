@@ -11,8 +11,7 @@ int main()
     electionAddArea(election, 04, "haifa");
     electionAddArea(election, 03, "tel aviv");
 
-    electionSetTribeName(election, 01, "meretz!@");
-
+    electionRemoveTribe(election, 02);
 
 
     return 0;
