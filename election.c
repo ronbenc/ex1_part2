@@ -279,7 +279,7 @@ Map electionComputeAreasToTribesMapping (Election election)
                         mapDestroy(electionFinalResults);
                         return NULL;
                     }
-                    if(strcmp(*max_tribe, curr_tribe > 0)
+                    if(strcmp(*max_tribe, curr_tribe > 0))
                     {
                         max_tribe = &curr_tribe;
                     }
