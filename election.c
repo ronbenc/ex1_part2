@@ -313,20 +313,22 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
      if(election == NULL || should_delete_area == NULL)
         return ELECTION_NULL_ARGUMENT;
     
-    int prev_area_id = -1;
-    MAP_FOREACH(area_id_iterator, election->areas)
+    Map iterator_map = mapCopy(election->areas); // a copy for iteration
+    if(iterator_map == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+    
+    MAP_FOREACH(area_id_iterator,iterator_map)
     {
         int curr_area_id = stringToInt(area_id_iterator);
-        if(should_delete_area(prev_area_id))
+        if(should_delete_area(curr_area_id))
         {
-            electionRemoveAreaFromTribes(election->areas,intToString(prev_area_id));
+            electionRemoveAreaFromTribes(election->areas, area_id_iterator);
             //electionRemoveAreaFromVotes
         }
-
-        prev_area_id = curr_area_id;
     }
 
-    //where to implemnt ElECTION_OUT_OF_MEMORY case?
+    mapDestroy(iterator_map);
+
     return MAP_SUCCESS;
 }
 
