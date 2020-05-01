@@ -124,83 +124,63 @@ void electionDestroy(Election election) //Ron
     free(election);
 }
 
-ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
+//adds an item to a specified map
+static ElectionResult electionAddItemToMap(Election election, Map map, int item_id, const char* item_name)
 {
-    if(election == NULL || tribe_name == NULL)
+    if(election == NULL || item_name == NULL)
         return ELECTION_NULL_ARGUMENT;
     
-    if(!isIdValid(tribe_id))
+    if(!isIdValid(item_id))
         return ELECTION_INVALID_ID;
     
-    char* str_tribe_id = intToString(tribe_id);
-    if(str_tribe_id == NULL)
+    char* str_item_id = intToString(item_id);
+    if(str_item_id == NULL)
         return ELECTION_OUT_OF_MEMORY;
     
-    if(mapContains(election->tribes, str_tribe_id))
+    if(mapContains(map, str_item_id))
     {
-        free(str_tribe_id);
-        return ELECTION_TRIBE_ALREADY_EXIST;
+        free(str_item_id);
+        if(election->tribes == map)
+        {
+            return ELECTION_TRIBE_ALREADY_EXIST;
+        }
+
+        assert(election->areas == map);
+        return ELECTION_AREA_ALREADY_EXIST;
     }
     
-    if(!isNameValid(tribe_name))
+    if(!isNameValid(item_name))
     {
-        free(str_tribe_id);
+        free(str_item_id);
         return ELECTION_INVALID_NAME;
     }
 
-    MapResult tmp_map_result = mapPut(election->tribes, str_tribe_id, tribe_name);
+    MapResult tmp_map_result = mapPut(election->tribes, str_item_id, item_name);
     assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
 
     if(tmp_map_result != MAP_SUCCESS)
     {
-        free(str_tribe_id);
+        free(str_item_id);
         return ELECTION_OUT_OF_MEMORY;
     }
     else
     {
-        free(str_tribe_id);
+        assert(tmp_map_result == MAP_SUCCESS);
+        free(str_item_id);
         return ELECTION_SUCCESS;
-    }
+    }  
+}
+
+ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
+{
+    return electionAddItemToMap(election, election->tribes, tribe_id, tribe_name);
 }
 
 ElectionResult electionAddArea(Election election, int area_id, const char* area_name) //Ron
 {
-    if(election == NULL || area_name == NULL)
-        return ELECTION_NULL_ARGUMENT;
-    
-    if(!isIdValid(area_id))
-        return ELECTION_INVALID_ID;
-    
-    char* str_area_id = intToString(area_id);
-    if(str_area_id == NULL)
-        return ELECTION_OUT_OF_MEMORY;
-    
-    if(mapContains(election->tribes, str_area_id))
-    {
-        free(str_area_id);
-        return ELECTION_TRIBE_ALREADY_EXIST;
-    }
-    
-    if(!isNameValid(area_name))
-    {
-        free(str_area_id);
-        return ELECTION_INVALID_NAME;
-    }
-
-    MapResult tmp_map_result = mapPut(election->areas, str_area_id, area_name);
-    assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
-
-    if(tmp_map_result != MAP_SUCCESS)
-    {
-        free(str_area_id);
-        return ELECTION_OUT_OF_MEMORY;
-    }
-    else
-    {
-        free(str_area_id);
-        return ELECTION_SUCCESS;
-    }
+    return electionAddItemToMap(election, election->areas, area_id, area_name);
 }
+
 
 char* electionGetTribeName (Election election, int tribe_id) //Ron
 {
@@ -212,7 +192,10 @@ char* electionGetTribeName (Election election, int tribe_id) //Ron
         return NULL;
     
     if(!mapContains(election->tribes, str_tribe_id))
+    {
+        free(str_tribe_id);
         return NULL;
+    }
     
     char* tribe_name = mapGet(election->tribes, str_tribe_id);
     free(str_tribe_id);
@@ -258,7 +241,7 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
     }
 }
 
-
+//removes an item(key and value) from a map
 static void electionRemoveItemFromMap(Map map, const char* item)
 {
     assert(map != NULL);
