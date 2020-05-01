@@ -93,24 +93,6 @@ static ElectionResult argCheck(Election election, int area_id, int tribe_id, int
 }
 
 
-//generates a unique key to votes map, which contains area and tribe voted for
-//tests needed
-static char* votesKeyGenerate(char* area_id, char* tribe_id){
-    char partition_char = PARTITION_CHAR;
-    char* ptr = &partition_char;
-    int len = strlen(area_id) + strlen(tribe_id) + 2; //additional partition char & /0
-    char* new_key = malloc(len*sizeof(char));
-    if(new_key == NULL){
-        return NULL;
-    }
-    strcpy(new_key, area_id);
-    strcat(new_key, ptr);
-    strcat(new_key, tribe_id);
-    assert(strlen(new_key) == len);
-    return new_key;
-}
-
-
 Election electionCreate() //Ron
 {
     Election election = malloc(sizeof(*election));
@@ -335,7 +317,7 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 }
 
 //extracts area id from a generated key in votes map
-static char* areaGet(char* generated_key)
+static char* votesAreaGet(char* generated_key)
 {
     char* ptr = generated_key;
     int len = 0;
@@ -353,7 +335,7 @@ static char* areaGet(char* generated_key)
 }
 
 //extracts tribe id from a generated key in votes map
-static char* tribeGet(char* generated_key)
+static char* votesTribeGet(char* generated_key)
 {
     char* ptr = generated_key;
     int offset = 0, len = 0;
@@ -375,8 +357,26 @@ static char* tribeGet(char* generated_key)
     return strncpy(tribe_id, generated_key + offset + 1, len);
 }
 
+//generates a unique key to votes map, which contains area and tribe voted for
+//tests needed
+static char* votesKeyGenerate(char* area_id, char* tribe_id){
+    char partition_char = PARTITION_CHAR;
+    char* ptr = &partition_char;
+    int len = strlen(area_id) + strlen(tribe_id) + 2; //additional partition char & /0
+    char* new_key = malloc(len*sizeof(char));
+    if(new_key == NULL){
+        return NULL;
+    }
+    strcpy(new_key, area_id);
+    strcat(new_key, ptr);
+    strcat(new_key, tribe_id);
+    assert(strlen(new_key) == len);
+    return new_key;
+}
+
+
 //set final results map with area names, vals set to NULL
-static Map FinalResultsMapSet(Election election)
+static Map finalResultsMapSet(Election election)
 {
     Map electionFinalResults = mapCopy(election->areas);
     if(!electionFinalResults)
@@ -393,18 +393,19 @@ static Map FinalResultsMapSet(Election election)
 
 Map electionComputeAreasToTribesMapping (Election election)
 {
-    Map electionFinalResults = FinalResultsMapSet(election);
+    Map electionFinalResults = finalResultsMapSet(election);
     if(electionFinalResults == MAP_OUT_OF_MEMORY)
     {
         return NULL;
     }
+    assert(electionFinalResults == MAP_SUCCESS);
     MAP_FOREACH(areas_iter, election->areas)
     {
         char** max_vote = NULL;
         char** max_tribe = NULL;
         MAP_FOREACH(votes_iter, election->votes)
         {
-            char* curr_area = areaGet(votes_iter);
+            char* curr_area = votesAreaGet(votes_iter);
             if(!curr_area)
             {
                 mapDestroy(electionFinalResults);
@@ -416,22 +417,23 @@ Map electionComputeAreasToTribesMapping (Election election)
                 if(stringToInt(curr_vote) >= stringToInt(*max_vote))
                 {
                     max_vote = &curr_vote;
-                    char* curr_tribe = tribeGet(votes_iter);
+                    char* curr_tribe = votesTribeGet(votes_iter);
                     if(!curr_tribe)
                     {
                         mapDestroy(electionFinalResults);
                         return NULL;
                     }
-                    if(strcmp(*max_tribe, curr_tribe > 0)
+                    if(strcmp(*max_tribe, curr_tribe) > 0)
                     {
                         max_tribe = &curr_tribe;
                     }
                 }
             }
         }
-        assert(areas_iter && *max_tribe && electionFinalResults);
-        if (mapPut(electionFinalResults, areas_iter, *max_tribe) == MAP_OUT_OF_MEMORY)
+        MapResult mapPutResult = mapPut(electionFinalResults, areas_iter, *max_tribe);
+        if (mapPutResult != MAP_SUCCESS)
         {
+            assert(mapPutResult == MAP_OUT_OF_MEMORY);
             destroy(electionFinalResults);
             return NULL;
         }
@@ -460,45 +462,6 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
         return ELECTION_OUT_OF_MEMORY;
     }
 }
-
-ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes){
-    ElectionResult argCheckResult = argCheck(election, area_id, tribe_id, num_of_votes);
-    if(argCheckResult != ELECTION_SUCCESS){
-        return argCheckResult;
-    }
-    char* curr_key = votesKeyGenerate(intToString(area_id), intToString(tribe_id));
-    if(!curr_key){
-        electionDestroy(election);
-        return ELECTION_OUT_OF_MEMORY;
-    }
-    assert(election->votes && curr_key && num_of_votes); //supposed to be valid    
-    
-    char* prev_votes = stringToInt(mapContains(election->votes, curr_key)
-                            ? mapGet(election->votes, curr_key) : NO_VOTES);
-    if(!prev_votes){
-        free(curr_key);
-        electionDestroy(election);
-        return ELECTION_OUT_OF_MEMORY;
-    }    
-    
-    char* curr_votes = intToString(max(num_of_votes + stringToInt(prev_votes), NO_VOTES)); //in case a bigger number should be subtracted
-    if(!curr_votes){
-        free(curr_key);
-        electionDestroy(election);
-        return ELECTION_OUT_OF_MEMORY;
-    }
-
-    MapResult mapPutResult = mapPut(election->votes, curr_key, curr_votes);
-    free(curr_key);
-    if(mapPutResult == MAP_NULL_ARGUMENT){
-        electionDestroy(election);
-        return ELECTION_OUT_OF_MEMORY;
-    }
-    assert(mapPutResult == MAP_SUCCESS);
-    return ELECTION_SUCCESS;
-}
-
-ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes); //Itay
 
 //tests needed - Itay, duplicate check
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes)
