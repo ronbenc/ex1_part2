@@ -15,14 +15,6 @@ struct election_t
     Map votes;
 };
 
-//currently uses strings.
-
-
-// static char* votesGetTribeId(char* votes_key);
-
-// static char* votesGetAreaId(char* votes_key);
-
-
 //true if id is a positive integer. false otherwise.
 static inline bool isIdValid(int id)
 {
@@ -267,11 +259,11 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
 }
 
 
-static void electionRemoveTribeFromTribes(Map tribes, const char* str_tribe_id)
+static void electionRemoveItemFromMap(Map map, const char* item)
 {
-    assert(tribes != NULL);
-    assert(mapContains(tribes, str_tribe_id));
-    mapRemove(tribes, str_tribe_id);
+    assert(map != NULL);
+    assert(mapContains(map, item));
+    mapRemove(map, item);
 }
 
 // static void electionRemoveTribeFromVotes(Election election, int tribe_id);
@@ -294,21 +286,13 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
         return ELECTION_TRIBE_NOT_EXIST;
     }
 
-    electionRemoveTribeFromTribes(election->tribes, str_tribe_id);
+    electionRemoveItemFromMap(election->tribes, str_tribe_id);
     //electionRemoveTribeFromVotes
 
     return ELECTION_SUCCESS;
 }
 
-static void electionRemoveAreaFromTribes(Map areas, const char* str_area_id)
-{
-    assert(areas != NULL);
-    assert(mapContains(areas, str_area_id));
-    mapRemove(areas, str_area_id);
-}
-
 // static void electionRemoveAreaFromVotes(Election election, int area_id);
-
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area) //Seperate to static func
 {
@@ -324,7 +308,7 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
         int curr_area_id = stringToInt(area_id_iterator);
         if(should_delete_area(curr_area_id))
         {
-            electionRemoveAreaFromTribes(election->areas, area_id_iterator);
+            electionRemoveItemFromMap(election->areas, area_id_iterator);
             //electionRemoveAreaFromVotes
         }
     }
