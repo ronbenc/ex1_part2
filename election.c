@@ -17,12 +17,6 @@ struct election_t
 
 //currently uses strings.
 
-
-// static char* votesGetTribeId(char* votes_key);
-
-// static char* votesGetAreaId(char* votes_key);
-
-
 //true if id is a positive integer. false otherwise.
 static inline bool isIdValid(int id)
 {
@@ -71,27 +65,6 @@ static char* intToString(int num)
 static int stringToInt(const char* str){
     return atoi(str);
 }
-
-//checks if all arguments to electionAddVote are valid
-static ElectionResult argCheck(Election election, int area_id, int tribe_id, int num_of_votes){
-    if(!election || !area_id || !tribe_id){
-        return ELECTION_NULL_ARGUMENT;
-    }
-    if(tribe_id < 0 || area_id < 0){
-        return ELECTION_INVALID_ID;
-    }
-    if(num_of_votes <= 0){
-        return ELECTION_INVALID_VOTES;
-    }
-    if(!mapContains(election->areas, intToString(area_id))){
-        return ELECTION_AREA_NOT_EXIST;
-    }
-    if(!mapContains(election->tribes, intToString(tribe_id))){
-        return ELECTION_TRIBE_NOT_EXIST;
-    }
-    return ELECTION_SUCCESS;
-}
-
 
 Election electionCreate() //Ron
 {
@@ -441,6 +414,26 @@ Map electionComputeAreasToTribesMapping (Election election)
     return electionFinalResults;
 }
 
+//checks if all arguments to electionAddVote are valid
+static ElectionResult electionVoteUpdateargCheck(Election election, int area_id, int tribe_id, int num_of_votes){
+    if(!election || !area_id || !tribe_id){
+        return ELECTION_NULL_ARGUMENT;
+    }
+    if(tribe_id < 0 || area_id < 0){
+        return ELECTION_INVALID_ID;
+    }
+    if(num_of_votes <= 0){
+        return ELECTION_INVALID_VOTES;
+    }
+    if(!mapContains(election->areas, intToString(area_id))){
+        return ELECTION_AREA_NOT_EXIST;
+    }
+    if(!mapContains(election->tribes, intToString(tribe_id))){
+        return ELECTION_TRIBE_NOT_EXIST;
+    }
+    return ELECTION_SUCCESS;
+}
+
 //updating number of votes of a certain area to a certain tribe
 //tests needed - Itay
 static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_votes)
@@ -466,7 +459,7 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
 //tests needed - Itay, duplicate check
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes)
 {
-    ElectionResult argCheckResult = argCheck(election, area_id, tribe_id, num_of_votes);
+    ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);
     if(argCheckResult != ELECTION_SUCCESS)
     {
         return argCheckResult;
@@ -492,7 +485,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
 //tests needed - Itay
 ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, int num_of_votes)
 {
-    ElectionResult argCheckResult = argCheck(election, area_id, tribe_id, num_of_votes);
+    ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);
     if(argCheckResult != ELECTION_SUCCESS)
     {
         return argCheckResult;
