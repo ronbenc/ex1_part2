@@ -226,7 +226,7 @@ static void electionRemoveItemFromMap(Map map, const char* item)
     mapRemove(map, item);
 }
 
-// static void electionRemoveTribeFromVotes(Election election, int tribe_id);
+// static void electionRemoveTribeFromVotes(Election election, int tribe_id); Itay
 
 ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate to static func
 {
@@ -258,7 +258,7 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
     return ELECTION_SUCCESS;
 }
 
-// static void electionRemoveAreaFromVotes(Election election, int area_id);
+// static void electionRemoveAreaFromVotes(Election election, int area_id); Itay
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area) //Seperate to static func
 {
@@ -455,7 +455,7 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
     }
 }
 
-//tests needed - Itay, duplicate check
+//tests needed
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes)
 {
     ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);

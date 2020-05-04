@@ -18,6 +18,7 @@ int main()
 
     electionRemoveTribe(election, 02);
     electionRemoveAreas(election, *remove_func);
+    printf("Check\n");
 
     return 0;
 }
