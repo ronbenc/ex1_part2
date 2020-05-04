@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-C:/home/ronbenc/projects/HW1/part2/election.c
+C:/Users/Public/MTM_Files/ex1_part2/election.c
 election.h
-C:/home/ronbenc/projects/HW1/part2/election.h
+C:/Users/Public/MTM_Files/ex1_part2/election.h
 map.h
-C:/home/ronbenc/projects/HW1/part2/map.h
+C:/Users/Public/MTM_Files/ex1_part2/map.h
 stdio.h
 -
 assert.h
@@ -18,17 +18,17 @@ assert.h
 stdlib.h
 -
 
-C:/home/ronbenc/projects/HW1/part2/election.h
+C:/Users/Public/MTM_Files/ex1_part2/election.h
 mtm_map/map.h
-C:/home/ronbenc/projects/HW1/part2/mtm_map/map.h
+C:/Users/Public/MTM_Files/ex1_part2/mtm_map/map.h
 
-C:/home/ronbenc/projects/HW1/part2/map.h
+C:/Users/Public/MTM_Files/ex1_part2/map.h
 stdbool.h
 -
 string.h
 -
 
-C:/home/ronbenc/projects/HW1/part2/mtm_map/map.h
+C:/Users/Public/MTM_Files/ex1_part2/mtm_map/map.h
 stdbool.h
 -
 string.h
