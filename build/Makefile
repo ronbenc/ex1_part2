@@ -166,33 +166,6 @@ election.c.s:
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/election.c.s
 .PHONY : election.c.s
 
-main.obj: main.c.obj
-
-.PHONY : main.obj
-
-# target to build an object file
-main.c.obj:
-	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/main.c.obj
-.PHONY : main.c.obj
-
-main.i: main.c.i
-
-.PHONY : main.i
-
-# target to preprocess a source file
-main.c.i:
-	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/main.c.i
-.PHONY : main.c.i
-
-main.s: main.c.s
-
-.PHONY : main.s
-
-# target to generate assembly for a file
-main.c.s:
-	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/main.c.s
-.PHONY : main.c.s
-
 mtm_map/map.obj: mtm_map/map.c.obj
 
 .PHONY : mtm_map/map.obj
@@ -232,9 +205,6 @@ help:
 	@echo ... election.obj
 	@echo ... election.i
 	@echo ... election.s
-	@echo ... main.obj
-	@echo ... main.i
-	@echo ... main.s
 	@echo ... mtm_map/map.obj
 	@echo ... mtm_map/map.i
 	@echo ... mtm_map/map.s

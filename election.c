@@ -73,7 +73,6 @@ Election electionCreate() //Ron
     election->tribes = mapCreate();
     election->areas = mapCreate();
     election->votes = mapCreate();
-
     return election;
 }
 
@@ -122,7 +121,7 @@ static ElectionResult electionAddItemToMap(Election election, Map map, int item_
         return ELECTION_INVALID_NAME;
     }
 
-    MapResult tmp_map_result = mapPut(election->tribes, str_item_id, item_name);
+    MapResult tmp_map_result = mapPut(map, str_item_id, item_name);
     assert(tmp_map_result != MAP_NULL_ARGUMENT); // not supposed to happen
 
     if(tmp_map_result != MAP_SUCCESS)
@@ -331,17 +330,21 @@ static char* votesTribeGet(char* generated_key)
 
 //generates a unique key to votes map, which contains area and tribe voted for
 //tests needed
-static char* votesKeyGenerate(char* area_id, char* tribe_id){
-    char partition_char = PARTITION_CHAR;
-    char* ptr = &partition_char;
-    int len = strlen(area_id) + strlen(tribe_id) + 2; //additional partition char & /0
+static char* votesKeyGenerate(char* area_id, char* tribe_id)
+{
+    if(!area_id || !tribe_id){
+        return NULL;
+    }
+    char partition_str[2] = {PARTITION_CHAR,'\0'};
+    long long int len = strlen(area_id) + strlen(tribe_id) + strlen(partition_str); //additional partition char & /0
     char* new_key = malloc(len*sizeof(char));
-    if(new_key == NULL){
+    if(new_key == NULL)
+    {
         return NULL;
     }
     strcpy(new_key, area_id);
-    strcat(new_key, ptr);
-    strcat(new_key, tribe_id);
+    strcat(new_key, partition_str);    
+    strcat(new_key, tribe_id);         
     assert(strlen(new_key) == len);
     return new_key;
 }
@@ -349,16 +352,20 @@ static char* votesKeyGenerate(char* area_id, char* tribe_id){
 Map electionComputeAreasToTribesMapping (Election election)
 {
     Map electionFinalResults = mapCopy(election->areas);
-    if(electionFinalResults != MAP_SUCCESS)
+    if(!electionFinalResults)
     {
+        printf("mapCopy in compute function failed!\n");//debug
         return NULL;
     }
+    printf("mapCopy in compute function SUCCESS!\n");//debug
     MAP_FOREACH(areas_iter, election->areas)
     {
         char** max_vote = NULL;
         char** max_tribe = NULL;
+        int i = 0;//debug
         MAP_FOREACH(votes_iter, election->votes)
         {
+            printf("entered MAP_FOREACH inside compute number %d", i++);//debug
             char* curr_area = votesAreaGet(votes_iter);
             if(!curr_area)
             {
@@ -453,28 +460,49 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
     ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);
     if(argCheckResult != ELECTION_SUCCESS)
     {
+        printf("arguments to electionAddVote function invalid!\n");//debug
         return argCheckResult;
     }
+    printf("arguments to electionAddVote function are valid!\n");//debug
     char* curr_key = votesKeyGenerate(intToString(area_id), intToString(tribe_id));
     if(!curr_key)
     {
+        printf("votesKeyGenerator failed!\n");//debug
         electionDestroy(election);
         return ELECTION_OUT_OF_MEMORY;
     }
+    printf("key was generated successfully!\n");//debug
     assert(election->votes && curr_key && num_of_votes); //supposed to be valid       
     if(mapContains(election->votes, curr_key))
     {
-       return votesUpdate(election, curr_key, num_of_votes);
-    }    
-    else
+        printf("detected there are already votes from the area to the tribe!\n");
+        //debug changes
+       ElectionResult updatesuccess = votesUpdate(election, curr_key, num_of_votes);
+       if(updatesuccess != ELECTION_SUCCESS)
+        {
+            printf("problem in votesUpdate function, inside implementation of electionAddVote!\n");
+            return ELECTION_OUT_OF_MEMORY;//DEBUG!!!!
+        }
+        else
+        {
+            return ELECTION_SUCCESS;
+        }
+    }
+    else 
     {
         char* toAdd = intToString(num_of_votes);
         if(!toAdd)
         {
             return ELECTION_OUT_OF_MEMORY;
         }
-        return mapPut(election->votes, curr_key, toAdd);
+        assert(election->votes && curr_key && toAdd);
+        MapResult mapPutResult = mapPut(election->votes, curr_key, toAdd);//debug change
+        if(mapPutResult != MAP_SUCCESS){
+            printf("detected a problem in putting the totally new value to votes map!\n");//debug
+            return mapPutResult;
+        }
     }
+    return ELECTION_SUCCESS;
 }
 
 
@@ -501,4 +529,97 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     {
         return ELECTION_SUCCESS;
     }
+}
+
+static void mapPrint(Map map) //debug
+{
+    MAP_FOREACH(iter, map)
+    {
+        printf("Key: %s |||| Value: %s\n", iter, mapGet(map, iter));
+    }
+}
+
+int main(){
+    Election election = electionCreate();
+    if(!election){
+        return 0;
+    }
+    ElectionResult Add1 = electionAddTribe(election, 1, "likud");    
+    if(Add1 != ELECTION_SUCCESS){
+        printf("1st function failed!\n");
+        return 0;
+    }
+    mapPrint(election->areas);
+    printf("finished printing areas map after 1st adding\n");
+    mapPrint(election->tribes);
+    printf("finished printing tribes map after 1st adding\n");
+
+    ElectionResult Add2 = electionAddTribe(election, 2, "kahol lavan");
+    if(Add2 != ELECTION_SUCCESS){
+        printf("second function failed!\n");
+        return 0;
+    }
+    mapPrint(election->areas);
+    printf("finished printing areas map after 2nd adding\n");
+    mapPrint(election->tribes);
+    printf("finished printing tribes map after 2nd adding\n");
+
+    ElectionResult Add3 = electionAddArea(election, 3, "haifa");
+       if(Add3 != ELECTION_SUCCESS){
+        printf("3rd function failed!\n");
+        return 0;
+    }
+    mapPrint(election->areas);
+    printf("finished printing areas map after 3rd adding\n");
+    mapPrint(election->tribes);
+    printf("finished printing tribes map after 3rd adding\n");
+
+    ElectionResult Add4 = electionAddArea(election, 4, "tel aviv");
+       if(Add4 != ELECTION_SUCCESS){
+        printf("4th function failed!\n");
+        return 0;
+    }
+    mapPrint(election->areas);
+    printf("finished printing areas map after 4th adding\n");
+    mapPrint(election->tribes);
+    printf("finished printing tribes map after 4th adding\n");
+    
+    
+    /*Map map_temp = mapCreate();
+    mapPut(map_temp, "itay", "slepian");
+    mapPut(map_temp, "yuval", "slepian");
+    mapPut(map_temp, "maya", "slepian");
+    mapPrint(map_temp);
+    Map map_temp_copy = mapCopy(map_temp);
+    if(!map_temp_copy){
+        printf("mapCopy function failed in main!\n");
+    }
+    printf("copied map is:\n");
+    mapPrint(map_temp_copy);
+    printf("finish check\n");//debug*/
+    
+    //mapPrint(electionComputeAreasToTribesMapping(election));//debug
+    
+    ElectionResult Add5 = electionAddVote(election, 3, 1, 4);
+       if(Add5 != ELECTION_SUCCESS){
+        printf("5th function failed!\n");
+        return 0;
+    }
+    ElectionResult Add6 = electionAddVote(election, 4, 2, 4);
+       if(Add6 != ELECTION_SUCCESS){
+        printf("6th function failed!\n");
+        return 0;
+    }
+    printf("printing votes map\n");
+    mapPrint(election->votes);
+    Map electionComputeResult = electionComputeAreasToTribesMapping(election);
+    if(electionComputeResult != MAP_SUCCESS)
+    {
+        printf("problem in compute funtion detected!\n");
+        return 0;
+    }
+    printf("printing final results map:\n");
+    mapPrint(electionComputeResult);
+
+    return 1;
 }

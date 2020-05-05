@@ -90,12 +90,12 @@ clean: CMakeFiles/election.dir/clean
 CMakeFiles/election.dir/all:
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/depend
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=1,2,3,4 "Built target election"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=1,2,3 "Built target election"
 .PHONY : CMakeFiles/election.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/election.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 3
 	$(MAKE) -f CMakeFiles\Makefile2 CMakeFiles/election.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 0
 .PHONY : CMakeFiles/election.dir/rule
