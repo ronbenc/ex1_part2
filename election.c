@@ -73,6 +73,12 @@ Election electionCreate() //Ron
     election->tribes = mapCreate();
     election->areas = mapCreate();
     election->votes = mapCreate();
+
+    if(election->tribes == NULL || election->areas == NULL || election->votes == NULL)
+    {
+        electionDestroy(election);
+        return NULL;
+    }
     return election;
 }
 
