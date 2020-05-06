@@ -22,19 +22,7 @@ C:/Users/Public/MTM_Files/ex1_part2/election.h
 mtm_map/map.h
 C:/Users/Public/MTM_Files/ex1_part2/mtm_map/map.h
 
-<<<<<<< Updated upstream
 C:/Users/Public/MTM_Files/ex1_part2/map.h
-=======
-C:/home/ronbenc/projects/HW1/part2/main.c
-stdio.h
--
-stdlib.h
--
-election.h
-C:/home/ronbenc/projects/HW1/part2/election.h
-
-C:/home/ronbenc/projects/HW1/part2/map.h
->>>>>>> Stashed changes
 stdbool.h
 -
 string.h
