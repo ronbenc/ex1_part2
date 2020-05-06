@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\election.dir/objects.a
-C:\TDM-GCC-64\bin\ar.exe cr CMakeFiles\election.dir/objects.a @CMakeFiles\election.dir\objects1.rsp
-C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe -std=c99 --pedantic-errors -Wall -Werror -g   -Wl,--whole-archive CMakeFiles\election.dir/objects.a -Wl,--no-whole-archive  -o election.exe -Wl,--out-implib,libelection.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\election.dir\linklibs.rsp
