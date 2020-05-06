@@ -50,7 +50,7 @@ int main(){
     printf("finished printing tribes map after 4th adding\n");
     
     
-    /*Map map_temp = mapCreate();
+    Map map_temp = mapCreate();
     mapPut(map_temp, "itay", "slepian");
     mapPut(map_temp, "yuval", "slepian");
     mapPut(map_temp, "maya", "slepian");

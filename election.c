@@ -531,7 +531,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     }
 }
 
-static void mapPrint(Map map) //debug
+void mapPrint(Map map) //debug
 {
     MAP_FOREACH(iter, map)
     {
