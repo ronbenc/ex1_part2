@@ -3,7 +3,8 @@
 #include "election.h"
 #include "mtm_map/map.h"
 
-int main(){
+int main()
+{
     /*
     Election election = electionCreate();
     if(!election){
@@ -85,6 +86,7 @@ int main(){
     }
     printf("printing final results map:\n");*/
     Map map = mapCreate();
+    mapPut(map,"1", "test print");
     mapPrint(map);
 
     return 1;
