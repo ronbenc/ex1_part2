@@ -349,14 +349,15 @@ static char* votesAreaGet(char* generated_key)
         ptr++;
     }
     char* area_id = malloc(len*(sizeof(*area_id) + 1));
+    area_id[len] = '\0';
     if(!area_id)
     {
         return NULL;
     }
     strncpy(area_id, generated_key, len);
-    area_id[len] = 0; //??
-    // int id_len = strlen(area_id);
-    // printf("area id: %s, length: %d\n", area_id, id_len);
+
+    int id_len = strlen(area_id);
+    printf("area id: %s, length: %d\n", area_id, id_len);
     
     return area_id;
 }
@@ -383,8 +384,8 @@ static char* votesTribeGet(char* generated_key)
         return NULL;
     }
     //assert(*(generated_key + area_len + 1 + tribe_len) == "\0");//ptr to end of string
-    return strncpy(tribe_id, generated_key + area_len + 1, tribe_len + 1);
-    //     return strcpy(tribe_id, generated_key + area_len +1);
+    //return strncpy(tribe_id, generated_key + area_len + 1, tribe_len + 1); debug
+    return strcpy(tribe_id, generated_key + area_len +1);
 }
 
 //generates a unique key to votes map, which contains area and tribe voted for
