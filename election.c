@@ -368,13 +368,14 @@ static char* votesKeyGenerate(char* area_id, char* tribe_id)
     char partition_str[2] = {PARTITION_CHAR,'\0'};
     long long int len = strlen(area_id) + strlen(tribe_id) + strlen(partition_str); //additional partition char & /0
     char* new_key = malloc(len*sizeof(char));
+    printf("generated key string length is %lld", len);
     if(new_key == NULL)
     {
         return NULL;
     }
     strcpy(new_key, area_id);
-    strcat(new_key, partition_str);    
-    strcat(new_key, tribe_id);         
+    strcpy(new_key + strlen(area_id), partition_str);
+    strcpy(new_key + strlen(area_id) + strlen(partition_str), tribe_id);
     assert(strlen(new_key) == len);
     return new_key;
 }
@@ -400,8 +401,15 @@ bool votesGetTest (char* area_id, char* tribe_id){
     else{
         printf("tribe_id failed extracting, verified by strcmp!\n");
     }
-    return(!strcmp(votesAreaGet(generated_key), area_id) && 
-            !strcmp(votesTribeGet(generated_key), tribe_id));
+    bool strcheck1 = strcmp(area_extract, area_id);
+    bool strcheck2 = strcmp(tribe_extract, tribe_id);
+    free(area_extract);
+    free(tribe_extract);
+    free(generated_key);
+    return(!strcheck1 && !strcheck2);
+
+    //return(!strcmp(votesAreaGet(generated_key), area_id) && 
+      //      !strcmp(votesTribeGet(generated_key), tribe_id));
 }
 
 
@@ -491,12 +499,29 @@ static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id,
     if(num_of_votes <= 0){
         return ELECTION_INVALID_VOTES;
     }
-    if(!mapContains(election->areas, intToString(area_id))){
+        char* area_id_str = intToString(area_id);
+    if(!area_id_str)
+    {
+        printf("area_id_str detected as null ptr after intToString call!\n");//debug
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    if(!mapContains(election->areas, area_id_str)){
+        free(area_id_str);
         return ELECTION_AREA_NOT_EXIST;
     }
-    if(!mapContains(election->tribes, intToString(tribe_id))){
+    char* tribe_id_str = intToString(tribe_id);
+    if(!tribe_id_str)
+    {
+        free(area_id_str);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    if(!mapContains(election->tribes, tribe_id_str)){
+        free(area_id_str);
+        free(tribe_id_str);
         return ELECTION_TRIBE_NOT_EXIST;
     }
+    free(area_id_str);
+    free(tribe_id_str);
     return ELECTION_SUCCESS;
 }
 
@@ -517,8 +542,7 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
     if(!new_val)
     {
         free(curr_key);
-        free(new_val);
-        electionDestroy(election);
+        free(new_val);        
         return ELECTION_OUT_OF_MEMORY;
     }
     MapResult mapPutResult = mapPut(election->votes, curr_key, new_val);
@@ -526,7 +550,6 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
     {
         free(curr_key);
         free(new_val);
-        electionDestroy(election);
         return ELECTION_OUT_OF_MEMORY;
     }
     return ELECTION_SUCCESS;
@@ -536,33 +559,56 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes)
 {
     ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);
+    if(argCheckResult == ELECTION_OUT_OF_MEMORY)
+    {        
+        return ELECTION_OUT_OF_MEMORY;
+    }
     if(argCheckResult != ELECTION_SUCCESS)
     {
         printf("arguments to electionAddVote function invalid!\n");//debug
         return argCheckResult;
     }
     printf("arguments to electionAddVote function are valid!\n");//debug
-    char* curr_key = votesKeyGenerate(intToString(area_id), intToString(tribe_id));
+    char* area_id_str = intToString(area_id);
+    if(!area_id_str)
+    {
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    char* tribe_id_str = intToString(tribe_id);
+    if(!tribe_id_str)
+    {
+        free(area_id_str);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    printf("area_id_str is %s, tribe_id_str is %s, let's generate!\n", area_id_str, tribe_id_str);
+    char* curr_key = votesKeyGenerate(area_id_str, tribe_id_str);
     if(!curr_key)
     {
         printf("votesKeyGenerator failed!\n");//debug
-        electionDestroy(election);
+        free(area_id_str);
+        free(tribe_id_str);
         return ELECTION_OUT_OF_MEMORY;
     }
-    printf("key was generated successfully!\n");//debug
+    printf("key was generated successfully, it is %s!\n", curr_key);//debug
     assert(election->votes && curr_key && num_of_votes); //supposed to be valid       
     if(mapContains(election->votes, curr_key))
     {
         printf("detected there are already votes from the area to the tribe!\n");
         //debug changes
-       ElectionResult updatesuccess = votesUpdate(election, curr_key, num_of_votes);
-       if(updatesuccess != ELECTION_SUCCESS)
+       ElectionResult updateSuccess = votesUpdate(election, curr_key, num_of_votes);
+       if(updateSuccess != ELECTION_SUCCESS)
         {
             printf("problem in votesUpdate function, inside implementation of electionAddVote!\n");
+            free(area_id_str);
+            free(tribe_id_str);
+            free(curr_key);
             return ELECTION_OUT_OF_MEMORY;//DEBUG!!!!
         }
         else
         {
+            free(area_id_str);
+            free(tribe_id_str);
+            free(curr_key);
             return ELECTION_SUCCESS;
         }
     }
@@ -571,15 +617,25 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
         char* toAdd = intToString(num_of_votes);
         if(!toAdd)
         {
+            free(area_id_str);
+            free(tribe_id_str);
             return ELECTION_OUT_OF_MEMORY;
         }
         assert(election->votes && curr_key && toAdd);
         MapResult mapPutResult = mapPut(election->votes, curr_key, toAdd);//debug change
         if(mapPutResult != MAP_SUCCESS){
+            free(area_id_str);
+            free(tribe_id_str);
+            free(toAdd);
+            free(curr_key);
             printf("detected a problem in putting the totally new value to votes map!\n");//debug
             return mapPutResult;
         }
+        free(toAdd);
     }
+    free(curr_key);
+    free(area_id_str);
+    free(tribe_id_str);
     return ELECTION_SUCCESS;
 }
 
@@ -609,10 +665,26 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     }
 }
 
-void mapPrint(Map map) //debug
+void areasPrint(Election election) //debug
 {
-    MAP_FOREACH(iter, map)
+    MAP_FOREACH(iter, election->areas)
     {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(map, iter));
+        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->areas, iter));
+    }
+}
+
+void tribesPrint(Election election) //debug
+{
+    MAP_FOREACH(iter, election->tribes)
+    {
+        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->tribes, iter));
+    }
+}
+
+void votesPrint(Election election) //debug
+{
+    MAP_FOREACH(iter, election->votes)
+    {
+        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->votes, iter));
     }
 }
