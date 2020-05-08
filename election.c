@@ -19,8 +19,8 @@ struct election_t
 static char* votesTribeGet(char* generated_key);
 static char* votesAreaGet(char* generated_key);
 
-//allocates a new string and copies given string data
-static char* copyString(const char* str)
+//allocates a new string and copies given string data. returns NULL if allocation is failed
+static char* copyString(const char* str)// exists in map.c maybe create a utility file
 {
     long int len = strlen(str);
     char* newStr = malloc(len + 1);
@@ -189,7 +189,8 @@ char* electionGetTribeName (Election election, int tribe_id) //Ron
         return NULL;
     }
     
-    char* tribe_name = copyString(mapGet(election->tribes, str_tribe_id));
+    char* tribe_name = copyString(mapGet(election->tribes, str_tribe_id)); //will return NULL if allocation is failed so no need to check
+
     free(str_tribe_id);
 
     return tribe_name;
