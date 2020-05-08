@@ -46,4 +46,8 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 
 Map electionComputeAreasToTribesMapping (Election election); //Itay
 
+void mapPrint(Map map);//debug temp
+
+bool votesGetTest (char* area_id, char* tribe_id);//debug temp
+
 #endif //MTM_ELECTION_H

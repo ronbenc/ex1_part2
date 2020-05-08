@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define PARTITION_CHAR '_'
 #define NO_VOTES 0
@@ -292,11 +293,12 @@ static char* votesAreaGet(char* generated_key)
 {
     char* ptr = generated_key;
     int len = 0;
-    while(*ptr++ != PARTITION_CHAR)
+    while(*ptr != PARTITION_CHAR)
     {
         len++;
+        ptr++;
     }
-    char* area_id = malloc(len*sizeof(*area_id));
+    char* area_id = malloc(len*(sizeof(*area_id) + 1));
     if(!area_id)
     {
         return NULL;
@@ -309,23 +311,25 @@ static char* votesAreaGet(char* generated_key)
 static char* votesTribeGet(char* generated_key)
 {
     char* ptr = generated_key;
-    int offset = 0, len = 0;
-    while(*ptr++ != PARTITION_CHAR)
+    int area_len = 0, tribe_len = 0;
+    while(*ptr != PARTITION_CHAR)
     {
-        offset++;
+        area_len++;
+        ptr++;
     }
-    ptr = ptr + offset + 1;
-    while(ptr++ != NULL)
+    ptr++;
+    while(*ptr != '\0')
     {
-        len++;
+        tribe_len++;
+        ptr++;
     }
-    char* tribe_id = malloc(len*sizeof(*tribe_id));
+    char* tribe_id = malloc(tribe_len*sizeof(*tribe_id));
     if(!tribe_id)
     {
         return NULL;
     }
-    assert(!(generated_key + offset + 1 + len));//ptr to end of string
-    return strncpy(tribe_id, generated_key + offset + 1, len);
+    //assert(*(generated_key + area_len + 1 + tribe_len) == "\0");//ptr to end of string
+    return strncpy(tribe_id, generated_key + area_len + 1, tribe_len);
 }
 
 //generates a unique key to votes map, which contains area and tribe voted for
@@ -349,6 +353,32 @@ static char* votesKeyGenerate(char* area_id, char* tribe_id)
     return new_key;
 }
 
+//back to static / remove
+bool votesGetTest (char* area_id, char* tribe_id){
+    printf("input in votesGetTest: area_id is %s, tribe_id is %s\n", area_id, tribe_id);
+    char* generated_key = votesKeyGenerate(area_id, tribe_id);
+    printf("generated key is %s\n", generated_key);
+    char* area_extract = votesAreaGet(generated_key);
+    char* tribe_extract = votesTribeGet(generated_key);
+    printf("area_id extracted from generated key is %s\n", area_extract);
+    printf("tribe_id extracted from generated key is %s\n", tribe_extract);
+    if(strcmp(area_id, area_extract) == 0){
+        printf("area_id was extracted successfully, verified by strcmp!\n");
+    }
+    else{
+        printf("area_id failed extracting, verified by strcmp!\n");
+    }
+    if(strcmp(tribe_id, tribe_extract) == 0){
+        printf("tribe_id was extracted successfully, verified by strcmp!\n");
+    }
+    else{
+        printf("tribe_id failed extracting, verified by strcmp!\n");
+    }
+    return(!strcmp(votesAreaGet(generated_key), area_id) && 
+            !strcmp(votesTribeGet(generated_key), tribe_id));
+}
+
+
 Map electionComputeAreasToTribesMapping (Election election)
 {
     Map electionFinalResults = mapCopy(election->areas);
@@ -360,13 +390,13 @@ Map electionComputeAreasToTribesMapping (Election election)
     printf("mapCopy in compute function SUCCESS!\n");//debug
     MAP_FOREACH(areas_iter, election->areas)
     {
-        char** max_vote = NULL;
-        char** max_tribe = NULL;
-        int i = 0;//debug
+        char* max_vote = NULL;
+        char* max_tribe = NULL;
+        printf("we are looking for all the votes from area %s\n", areas_iter);
         MAP_FOREACH(votes_iter, election->votes)
         {
-            printf("entered MAP_FOREACH inside compute number %d", i++);//debug
             char* curr_area = votesAreaGet(votes_iter);
+            printf("we see a vote from area %s, while looking for votes from area %s\n", curr_area, areas_iter);
             if(!curr_area)
             {
                 mapDestroy(electionFinalResults);
@@ -374,29 +404,51 @@ Map electionComputeAreasToTribesMapping (Election election)
             }
             if(strcmp(areas_iter, curr_area) == 0)
             {
+                printf("we detected this is a vote we need to consider\n");//debug
                 char* curr_vote = mapGet(election->votes, votes_iter);
-                if(stringToInt(curr_vote) >= stringToInt(*max_vote))
+                printf("Until now the max vote is %s. We just detected that area %s voted %s times\n", max_vote, curr_area, curr_vote);//debug
+                if(stringToInt(curr_vote) >= stringToInt(max_vote))
                 {
-                    max_vote = &curr_vote;
+                    printf("we detected a new max vote\n");//debug
+                    max_vote = curr_vote;
                     char* curr_tribe = votesTribeGet(votes_iter);
                     if(!curr_tribe)
                     {
                         mapDestroy(electionFinalResults);
                         return NULL;
                     }
-                    if(strcmp(*max_tribe, curr_tribe) > 0)
+                    printf("we just detected the tribe that has been voted was %s\n", curr_tribe);
+                    if(strcmp(max_tribe, curr_tribe) > 0)
                     {
-                        max_tribe = &curr_tribe;
+                        max_tribe = curr_tribe;
                     }
                 }
             }
         }
-        MapResult mapPutResult = mapPut(electionFinalResults, areas_iter, *max_tribe);
-        if (mapPutResult != MAP_SUCCESS)
+        //no voters in the area
+        if(!max_tribe)
         {
-            assert(mapPutResult == MAP_OUT_OF_MEMORY);
-            mapDestroy(electionFinalResults);
-            return NULL;
+            char* no_voters_str = "00";
+            printf("no_voters_str is %s\n", no_voters_str);//debug
+            printf("areas_iter %s\n", areas_iter);//debug
+            MapResult mapPutResult1 = mapPut(electionFinalResults, areas_iter, no_voters_str);
+            if(mapPutResult1 != MAP_SUCCESS)
+            {
+                assert(mapPutResult1 == MAP_OUT_OF_MEMORY);
+                mapDestroy(electionFinalResults);
+                return NULL;
+            }
+        }
+        //voters exist in the area
+        else
+        {
+            MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
+            if (mapPutResult2 != MAP_SUCCESS)
+            {
+                assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
+                mapDestroy(electionFinalResults);
+                return NULL;
+            }
         }
     }
     return electionFinalResults;
@@ -423,7 +475,7 @@ static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id,
 }
 
 //returning the max between two integers
-static int max(int a, int b)
+static int max_int(int a, int b)
 {
     return ((a >= b) ? a : b);
 }
@@ -435,7 +487,7 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
     assert(election->votes && curr_key && num_of_votes >= 0);
     int prev_val = stringToInt(mapGet(election->votes, curr_key));
     assert(prev_val >= 0);
-    char* new_val = intToString(max(prev_val + num_of_votes, NO_VOTES));
+    char* new_val = intToString(max_int(prev_val + num_of_votes, NO_VOTES));
     if(!new_val)
     {
         free(curr_key);
@@ -531,7 +583,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
     }
 }
 
-static void mapPrint(Map map) //debug
+void mapPrint(Map map) //debug
 {
     MAP_FOREACH(iter, map)
     {
