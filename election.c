@@ -235,7 +235,8 @@ static void electionRemoveItemFromMap(Map map, const char* item)
     mapRemove(map, item);
 }
 
-//removes a tribe and its votes from Votes. tested
+//removes a tribe and its votes from Votes. 
+//returns ELECTION_OUT_OF_MEMORY if allocation is failed and ELECTION_SUCCESS if removal is succesful
 static ElectionResult electionRemoveTribeFromVotes(Election election, const char* str_tribe_id)
 {
     assert(election != NULL && election->votes != NULL && str_tribe_id != NULL);
@@ -274,18 +275,22 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
         return ELECTION_OUT_OF_MEMORY;
     }
 
+    ElectionResult election_result = ELECTION_ERROR; 
     if(!mapContains(election->tribes, str_tribe_id))
     {
-        free(str_tribe_id);
-        return ELECTION_TRIBE_NOT_EXIST;
+        election_result = ELECTION_TRIBE_NOT_EXIST;
     }
 
     electionRemoveItemFromMap(election->tribes, str_tribe_id);
 
-    if(electionRemoveTribeFromVotes(election, str_tribe_id) == ELECTION_OUT_OF_MEMORY)
-        return ELECTION_OUT_OF_MEMORY;
+    if(election_result == ELECTION_ERROR)
+    {
+        election_result = electionRemoveTribeFromVotes(election, str_tribe_id);
+    }
 
-    return ELECTION_SUCCESS;
+    free(str_tribe_id);
+    assert(election_result != ELECTION_ERROR);
+    return election_result;
 }
 
 static ElectionResult electionRemoveAreaFromVotes(Election election, const char* str_area_id)
@@ -355,10 +360,7 @@ static char* votesAreaGet(char* generated_key)
         return NULL;
     }
     strncpy(area_id, generated_key, len);
-
-    int id_len = strlen(area_id);
-    printf("area id: %s, length: %d\n", area_id, id_len);
-    
+   
     return area_id;
 }
 
