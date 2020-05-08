@@ -59,10 +59,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Public\MTM_Files\ex1_part2
+CMAKE_SOURCE_DIR = C:\home\ronbenc\projects\HW1\part2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Public\MTM_Files\ex1_part2\build
+CMAKE_BINARY_DIR = C:\home\ronbenc\projects\HW1\part2\build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/election.dir/depend.make
@@ -75,42 +75,42 @@ include CMakeFiles/election.dir/flags.make
 
 CMakeFiles/election.dir/mtm_map/map.c.obj: CMakeFiles/election.dir/flags.make
 CMakeFiles/election.dir/mtm_map/map.c.obj: ../mtm_map/map.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/election.dir/mtm_map/map.c.obj"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\mtm_map\map.c.obj   -c C:\Users\Public\MTM_Files\ex1_part2\mtm_map\map.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/election.dir/mtm_map/map.c.obj"
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\mtm_map\map.c.obj   -c C:\home\ronbenc\projects\HW1\part2\mtm_map\map.c
 
 CMakeFiles/election.dir/mtm_map/map.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/election.dir/mtm_map/map.c.i"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\Public\MTM_Files\ex1_part2\mtm_map\map.c > CMakeFiles\election.dir\mtm_map\map.c.i
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\home\ronbenc\projects\HW1\part2\mtm_map\map.c > CMakeFiles\election.dir\mtm_map\map.c.i
 
 CMakeFiles/election.dir/mtm_map/map.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/election.dir/mtm_map/map.c.s"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\Public\MTM_Files\ex1_part2\mtm_map\map.c -o CMakeFiles\election.dir\mtm_map\map.c.s
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\home\ronbenc\projects\HW1\part2\mtm_map\map.c -o CMakeFiles\election.dir\mtm_map\map.c.s
 
 CMakeFiles/election.dir/election.c.obj: CMakeFiles/election.dir/flags.make
 CMakeFiles/election.dir/election.c.obj: ../election.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/election.dir/election.c.obj"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\election.c.obj   -c C:\Users\Public\MTM_Files\ex1_part2\election.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/election.dir/election.c.obj"
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\election.c.obj   -c C:\home\ronbenc\projects\HW1\part2\election.c
 
 CMakeFiles/election.dir/election.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/election.dir/election.c.i"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\Public\MTM_Files\ex1_part2\election.c > CMakeFiles\election.dir\election.c.i
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\home\ronbenc\projects\HW1\part2\election.c > CMakeFiles\election.dir\election.c.i
 
 CMakeFiles/election.dir/election.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/election.dir/election.c.s"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\Public\MTM_Files\ex1_part2\election.c -o CMakeFiles\election.dir\election.c.s
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\home\ronbenc\projects\HW1\part2\election.c -o CMakeFiles\election.dir\election.c.s
 
 CMakeFiles/election.dir/main.c.obj: CMakeFiles/election.dir/flags.make
 CMakeFiles/election.dir/main.c.obj: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/election.dir/main.c.obj"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\main.c.obj   -c C:\Users\Public\MTM_Files\ex1_part2\main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/election.dir/main.c.obj"
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\election.dir\main.c.obj   -c C:\home\ronbenc\projects\HW1\part2\main.c
 
 CMakeFiles/election.dir/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/election.dir/main.c.i"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\Public\MTM_Files\ex1_part2\main.c > CMakeFiles\election.dir\main.c.i
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\home\ronbenc\projects\HW1\part2\main.c > CMakeFiles\election.dir\main.c.i
 
 CMakeFiles/election.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/election.dir/main.c.s"
-	C:\TDM-GCC-64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\Public\MTM_Files\ex1_part2\main.c -o CMakeFiles\election.dir\main.c.s
+	C:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin\x86_64-w64-mingw32-gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\home\ronbenc\projects\HW1\part2\main.c -o CMakeFiles\election.dir\main.c.s
 
 # Object files for target election
 election_OBJECTS = \
@@ -128,7 +128,7 @@ election.exe: CMakeFiles/election.dir/build.make
 election.exe: CMakeFiles/election.dir/linklibs.rsp
 election.exe: CMakeFiles/election.dir/objects1.rsp
 election.exe: CMakeFiles/election.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable election.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable election.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\election.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -141,6 +141,6 @@ CMakeFiles/election.dir/clean:
 .PHONY : CMakeFiles/election.dir/clean
 
 CMakeFiles/election.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\Public\MTM_Files\ex1_part2 C:\Users\Public\MTM_Files\ex1_part2 C:\Users\Public\MTM_Files\ex1_part2\build C:\Users\Public\MTM_Files\ex1_part2\build C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles\election.dir\DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\home\ronbenc\projects\HW1\part2 C:\home\ronbenc\projects\HW1\part2 C:\home\ronbenc\projects\HW1\part2\build C:\home\ronbenc\projects\HW1\part2\build C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles\election.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/election.dir/depend
 

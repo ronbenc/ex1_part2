@@ -11,7 +11,12 @@
     }
 }*/
 
-int main(){
+bool removalFunc(int area_id)
+{
+    return (area_id == 20);
+}
+int main()
+{
     bool is_ok = votesGetTest("123", "456");
     if(!is_ok){
         printf("problem detected\n");
@@ -19,6 +24,17 @@ int main(){
     else{
         printf("function is good\n");
     }
+
+    Election election = electionCreate();
+    electionAddTribe(election, 1, "likud");
+    electionAddTribe(election, 2, "kahol lavan");
+    electionAddArea(election, 10, "haifa");
+    electionAddArea(election, 20, "tel aviv");
+    electionAddVote(election, 10, 1, 8);
+    electionAddVote(election, 20, 2, 3);
+    electionAddVote(election, 20, 1, 5);
+    electionRemoveAreas(election, *removalFunc);
+    electionDestroy(election);
     return 0;
 }
 

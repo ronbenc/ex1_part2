@@ -16,6 +16,9 @@ struct election_t
     Map votes;
 };
 
+static char* votesTribeGet(char* generated_key);
+static char* votesAreaGet(char* generated_key);
+
 //true if id is a positive integer. false otherwise.
 static inline bool isIdValid(int id)
 {
@@ -232,26 +235,26 @@ static void electionRemoveItemFromMap(Map map, const char* item)
     mapRemove(map, item);
 }
 
-//removes a tribe and its votes from Votes. tests needed
-// static ElectionResult electionRemoveTribeFromVotes(Election election, const char* str_tribe_id)
-// {
-//     assert(election != NULL && election->votes != NULL && str_tribe_id != NULL);
-//     Map iterator_map = mapCopy(election->votes);
-//     if(iterator_map == NULL)
-//         return ELECTION_OUT_OF_MEMORY;
-//     MAP_FOREACH(key_iterator, iterator_map)
-//     {
-//         char* curr_tribe = votesTribeGet(key_iterator);
-//         if(strcmp(curr_tribe, str_tribe_id) == 0)
-//         {
-//             mapRemove(election->votes, key_iterator);
-//         }
-//     }
+//removes a tribe and its votes from Votes. tested
+static ElectionResult electionRemoveTribeFromVotes(Election election, const char* str_tribe_id)
+{
+    assert(election != NULL && election->votes != NULL && str_tribe_id != NULL);
+    Map iterator_map = mapCopy(election->votes);
+    if(iterator_map == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+    MAP_FOREACH(key_iterator, iterator_map)
+    {
+        char* curr_tribe = votesTribeGet(key_iterator);
+        if(strcmp(curr_tribe, str_tribe_id) == 0)
+        {
+            mapRemove(election->votes, key_iterator);
+        }
+    }
 
-//     mapDestroy(iterator_map);
+    mapDestroy(iterator_map);
 
-//     return ELECTION_SUCCESS;
-// }
+    return ELECTION_SUCCESS;
+}
 
 ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate to static func
 {
@@ -278,13 +281,33 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
     }
 
     electionRemoveItemFromMap(election->tribes, str_tribe_id);
-    // if(electionRemoveTribeFromVotes(election, str_tribe_id) == ELECTION_OUT_OF_MEMORY)
-    //     return ELECTION_OUT_OF_MEMORY;
+
+    if(electionRemoveTribeFromVotes(election, str_tribe_id) == ELECTION_OUT_OF_MEMORY)
+        return ELECTION_OUT_OF_MEMORY;
 
     return ELECTION_SUCCESS;
 }
 
-// static void electionRemoveAreaFromVotes(Election election, int area_id); Itay
+static ElectionResult electionRemoveAreaFromVotes(Election election, const char* str_area_id)
+{
+    assert(election != NULL && election->votes != NULL && str_area_id != NULL);
+    Map iterator_map = mapCopy(election->votes);
+    if(iterator_map == NULL)
+        return ELECTION_OUT_OF_MEMORY;
+    MAP_FOREACH(key_iterator, iterator_map)
+    {
+        char* curr_area = votesAreaGet(key_iterator);
+
+        if(strcmp(curr_area, str_area_id) == 0)
+        {
+            mapRemove(election->votes, key_iterator);
+        }
+    }
+
+    mapDestroy(iterator_map);
+
+    return ELECTION_SUCCESS;
+}
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area) //Seperate to static func
 {
@@ -305,7 +328,8 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
         if(should_delete_area(curr_area_id))
         {
             electionRemoveItemFromMap(election->areas, area_id_iterator);
-            //electionRemoveAreaFromVotes
+             if(electionRemoveAreaFromVotes(election, area_id_iterator) == ELECTION_OUT_OF_MEMORY)
+        return ELECTION_OUT_OF_MEMORY;
         }
     }
 
@@ -330,6 +354,10 @@ static char* votesAreaGet(char* generated_key)
         return NULL;
     }
     strncpy(area_id, generated_key, len);
+    area_id[len] = 0; //??
+    // int id_len = strlen(area_id);
+    // printf("area id: %s, length: %d\n", area_id, id_len);
+    
     return area_id;
 }
 
@@ -355,7 +383,8 @@ static char* votesTribeGet(char* generated_key)
         return NULL;
     }
     //assert(*(generated_key + area_len + 1 + tribe_len) == "\0");//ptr to end of string
-    return strncpy(tribe_id, generated_key + area_len + 1, tribe_len);
+    return strncpy(tribe_id, generated_key + area_len + 1, tribe_len + 1);
+    //     return strcpy(tribe_id, generated_key + area_len +1);
 }
 
 //generates a unique key to votes map, which contains area and tribe voted for

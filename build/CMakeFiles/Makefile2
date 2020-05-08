@@ -60,17 +60,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-<<<<<<< HEAD
-CMAKE_SOURCE_DIR = C:\Users\Public\MTM_Files\ex1_part2
-
-# The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Public\MTM_Files\ex1_part2\build
-=======
 CMAKE_SOURCE_DIR = C:\home\ronbenc\projects\HW1\part2
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = C:\home\ronbenc\projects\HW1\part2\build
->>>>>>> 7ad4c79e7d07c126bb413923efb91bb4683ed0e7
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -97,14 +90,14 @@ clean: CMakeFiles/election.dir/clean
 CMakeFiles/election.dir/all:
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/depend
 	$(MAKE) -f CMakeFiles\election.dir\build.make CMakeFiles/election.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles --progress-num=1,2,3,4 "Built target election"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles --progress-num=1,2,3,4 "Built target election"
 .PHONY : CMakeFiles/election.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/election.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles 4
 	$(MAKE) -f CMakeFiles\Makefile2 CMakeFiles/election.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles 0
 .PHONY : CMakeFiles/election.dir/rule
 
 # Convenience name for target.

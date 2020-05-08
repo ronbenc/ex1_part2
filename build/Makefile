@@ -64,10 +64,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Public\MTM_Files\ex1_part2
+CMAKE_SOURCE_DIR = C:\home\ronbenc\projects\HW1\part2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Public\MTM_Files\ex1_part2\build
+CMAKE_BINARY_DIR = C:\home\ronbenc\projects\HW1\part2\build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -96,10 +96,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles\progress.marks
 	$(MAKE) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 0
-
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\home\ronbenc\projects\HW1\part2\build\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
