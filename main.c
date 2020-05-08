@@ -3,6 +3,53 @@
 #include "election.h"
 #include "mtm_map/map.h"
 
+
+
+/*void mapPrint(Map map) //debug
+{
+    MAP_FOREACH(iter, map)
+    {
+        printf("Key: %s |||| Value: %s\n", iter, mapGet(map, iter));
+    }
+}*/
+
+bool removalFunc(int area_id)
+{
+    return (area_id == 20);
+}
+
+
+int main()
+{
+    bool is_ok = votesGetTest("123", "456");
+    if(!is_ok){
+        printf("problem detected\n");
+    }
+    else{
+        printf("function is good\n");
+    }
+
+    Election election = electionCreate();
+    electionAddTribe(election, 1, "likud");
+    electionAddTribe(election, 2, "kahol lavan");
+    electionAddArea(election, 10, "haifa");
+    electionAddArea(election, 20, "tel aviv");
+    electionAddVote(election, 10, 1, 8);
+    electionAddVote(election, 20, 2, 3);
+    electionAddVote(election, 20, 1, 5);
+    electionRemoveAreas(election, *removalFunc);
+    electionDestroy(election);
+    return 0;
+}
+
+/*
+bool remove_func(int area_id)
+{
+    return (area_id == 3);
+    
+}
+
+>>>>>>> 4c93b10f6b6a2fcedf586bea04cdf0e3f4d5839a
 int main()
 {
     Election election = electionCreate();
@@ -112,7 +159,7 @@ int main()
 
     //mapPrint(electionComputeAreasToTribesMapping(election));//debug
 
-    /*Map electionComputeResult = electionComputeAreasToTribesMapping(election);
+    Map electionComputeResult = electionComputeAreasToTribesMapping(election);
     if(!electionComputeResult)
     {
         printf("problem in compute funtion detected!\n");
