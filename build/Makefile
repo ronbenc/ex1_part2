@@ -99,6 +99,7 @@ all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles\progress.marks
 	$(MAKE) -f CMakeFiles\Makefile2 all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Public\MTM_Files\ex1_part2\build\CMakeFiles 0
+
 .PHONY : all
 
 # The main clean target

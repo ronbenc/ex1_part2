@@ -60,10 +60,17 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
+<<<<<<< HEAD
 CMAKE_SOURCE_DIR = C:\Users\Public\MTM_Files\ex1_part2
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = C:\Users\Public\MTM_Files\ex1_part2\build
+=======
+CMAKE_SOURCE_DIR = C:\home\ronbenc\projects\HW1\part2
+
+# The top-level build directory on which CMake was run.
+CMAKE_BINARY_DIR = C:\home\ronbenc\projects\HW1\part2\build
+>>>>>>> 7ad4c79e7d07c126bb413923efb91bb4683ed0e7
 
 #=============================================================================
 # Directory level rules for the build root directory

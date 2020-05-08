@@ -74,6 +74,12 @@ Election electionCreate() //Ron
     election->tribes = mapCreate();
     election->areas = mapCreate();
     election->votes = mapCreate();
+
+    if(election->tribes == NULL || election->areas == NULL || election->votes == NULL)
+    {
+        electionDestroy(election);
+        return NULL;
+    }
     return election;
 }
 
@@ -218,15 +224,34 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
     }
 }
 
-//removes an item(key and value) from a map
+//removes an item (key and value) from a map
 static void electionRemoveItemFromMap(Map map, const char* item)
 {
-    assert(map != NULL);
+    assert(map != NULL && item != NULL);
     assert(mapContains(map, item));
     mapRemove(map, item);
 }
 
-// static void electionRemoveTribeFromVotes(Election election, int tribe_id); Itay
+//removes a tribe and its votes from Votes. tests needed
+// static ElectionResult electionRemoveTribeFromVotes(Election election, const char* str_tribe_id)
+// {
+//     assert(election != NULL && election->votes != NULL && str_tribe_id != NULL);
+//     Map iterator_map = mapCopy(election->votes);
+//     if(iterator_map == NULL)
+//         return ELECTION_OUT_OF_MEMORY;
+//     MAP_FOREACH(key_iterator, iterator_map)
+//     {
+//         char* curr_tribe = votesTribeGet(key_iterator);
+//         if(strcmp(curr_tribe, str_tribe_id) == 0)
+//         {
+//             mapRemove(election->votes, key_iterator);
+//         }
+//     }
+
+//     mapDestroy(iterator_map);
+
+//     return ELECTION_SUCCESS;
+// }
 
 ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate to static func
 {
@@ -253,7 +278,8 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
     }
 
     electionRemoveItemFromMap(election->tribes, str_tribe_id);
-    //electionRemoveTribeFromVotes
+    // if(electionRemoveTribeFromVotes(election, str_tribe_id) == ELECTION_OUT_OF_MEMORY)
+    //     return ELECTION_OUT_OF_MEMORY;
 
     return ELECTION_SUCCESS;
 }

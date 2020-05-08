@@ -66,7 +66,25 @@ int main()
        if(Add4 != ELECTION_SUCCESS){
         printf("4th function failed!\n");
         return 0;
-    }   
+    }
+    mapPrint(election->areas);
+    printf("finished printing areas map after 4th adding\n");
+    mapPrint(election->tribes);
+    printf("finished printing tribes map after 4th adding\n");
+    
+    
+    Map map_temp = mapCreate();
+    mapPut(map_temp, "itay", "slepian");
+    mapPut(map_temp, "yuval", "slepian");
+    mapPut(map_temp, "maya", "slepian");
+    mapPrint(map_temp);
+    Map map_temp_copy = mapCopy(map_temp);
+    if(!map_temp_copy){
+        printf("mapCopy function failed in main!\n");
+    }
+    printf("copied map is:\n");
+    mapPrint(map_temp_copy);
+    printf("finish check\n");//debug
     
     //mapPrint(electionComputeAreasToTribesMapping(election));//debug
     
