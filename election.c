@@ -19,6 +19,18 @@ struct election_t
 static char* votesTribeGet(char* generated_key);
 static char* votesAreaGet(char* generated_key);
 
+//allocates a new string and copies given string data
+static char* copyString(const char* str)
+{
+    long int len = strlen(str);
+    char* newStr = malloc(len + 1);
+
+    if (newStr == NULL)
+        return NULL;
+
+    return strcpy(newStr, str);
+}
+
 //true if id is a positive integer. false otherwise.
 static inline bool isIdValid(int id)
 {
@@ -55,7 +67,7 @@ static int getIntLength(int num)
 
 //converts an integer into a new allocated string. imprtant to free allocation after use
 static char* intToString(int num)
-{
+{   
     char* str_num = malloc(getIntLength(num) + 1);
     if(str_num == NULL)
         return NULL;
@@ -78,7 +90,7 @@ Election electionCreate() //Ron
     election->areas = mapCreate();
     election->votes = mapCreate();
 
-    if(election->tribes == NULL || election->areas == NULL || election->votes == NULL)
+    if(election->tribes == NULL || election->areas == NULL || election->votes == NULL) //if any of mapsCreate fails
     {
         electionDestroy(election);
         return NULL;
@@ -177,7 +189,7 @@ char* electionGetTribeName (Election election, int tribe_id) //Ron
         return NULL;
     }
     
-    char* tribe_name = mapGet(election->tribes, str_tribe_id);
+    char* tribe_name = copyString(mapGet(election->tribes, str_tribe_id));
     free(str_tribe_id);
 
     return tribe_name;
@@ -275,16 +287,15 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
         return ELECTION_OUT_OF_MEMORY;
     }
 
-    ElectionResult election_result = ELECTION_ERROR; 
+    ElectionResult election_result = ELECTION_ERROR; //used as a flag 
     if(!mapContains(election->tribes, str_tribe_id))
     {
         election_result = ELECTION_TRIBE_NOT_EXIST;
     }
 
-    electionRemoveItemFromMap(election->tribes, str_tribe_id);
-
     if(election_result == ELECTION_ERROR)
     {
+        electionRemoveItemFromMap(election->tribes, str_tribe_id);
         election_result = electionRemoveTribeFromVotes(election, str_tribe_id);
     }
 
@@ -293,6 +304,8 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
     return election_result;
 }
 
+//removes an Area and its votes from Votes. 
+//returns ELECTION_OUT_OF_MEMORY if allocation is failed and ELECTION_SUCCESS if removal is succesful
 static ElectionResult electionRemoveAreaFromVotes(Election election, const char* str_area_id)
 {
     assert(election != NULL && election->votes != NULL && str_area_id != NULL);
@@ -340,7 +353,7 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 
     mapDestroy(iterator_map);
 
-    return MAP_SUCCESS;
+    return ELECTION_SUCCESS;
 }
 
 //extracts area id from a generated key in votes map
