@@ -1,3 +1,0 @@
-C:/Users/Public/MTM_Files/ex1_part2/build/CMakeFiles/election.dir
-C:/Users/Public/MTM_Files/ex1_part2/build/CMakeFiles/edit_cache.dir
-C:/Users/Public/MTM_Files/ex1_part2/build/CMakeFiles/rebuild_cache.dir

@@ -1,17 +1,7 @@
-build/election.exe
-build/Makefile
-build/.cmake/api/v1/reply/cache-v2-3c8312798e87191b2db1.json
-build/.cmake/api/v1/reply/index-2020-05-07T19-56-00-0898.json
-build/.cmake/api/v1/reply/index-2020-05-08T14-18-07-0878.json
-build/.cmake/api/v1/reply/target-election-Debug-df1424c149d91f95592e.json
-build/CMakeFiles/CMakeOutput.log
-build/CMakeFiles/Makefile.cmake
-build/CMakeFiles/Makefile2
-build/CMakeFiles/3.17.0/CMakeDetermineCompilerABI_C.bin
-build/CMakeFiles/3.17.0/CompilerIdC/a.exe
-build/CMakeFiles/Progress/2
-build/CMakeFiles/Progress/4
-build/CMakeFiles/Progress/count.txt
-build/CMakeFiles/election.dir/election.c.obj
-build/CMakeFiles/election.dir/main.c.obj
-build/CMakeFiles/election.dir/objects.a
+# gitignore file made for mtm C projects by ronbenc
+.vscode/
+build/
+*.exe
+*.out
+*.o
+*.obj
