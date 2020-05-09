@@ -109,6 +109,7 @@ int main()
     if(Add5 != ELECTION_SUCCESS) 
     {
         printf("5th function failed!\n");
+        electionDestroy(election);
         return 0;
     }
     ElectionResult Add6 = electionAddVote(election, 4, 2, 4);
@@ -121,6 +122,7 @@ int main()
     if(Add6 != ELECTION_SUCCESS)
     {
         printf("6th function failed!\n");
+        electionDestroy(election);
         return 0;
     }
     printf("printing votes map after 2 votes!\n");

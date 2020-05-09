@@ -533,6 +533,7 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
         {
             int curr_vote_int = stringToInt(curr_vote);
             int max_vote_int = stringToInt(max_vote);
+            printf("inside computeResultsPerArea curr_vote is %d, max_vote is %d\n", curr_vote_int, max_vote_int);
             if(curr_vote_int > max_vote_int)
             {
                 printf("we detected a new max vote\n");//debug
@@ -571,6 +572,7 @@ Map electionComputeAreasToTribesMapping (Election election)
     }
     if(!mapGetFirst(election->areas) || !mapGetFirst(election->tribes))
     {
+        //mapClear?? itay debug
         mapDestroy(electionFinalResults);
         Map empty_map = mapCreate();        
         return (empty_map ? empty_map : NULL);
@@ -578,6 +580,10 @@ Map electionComputeAreasToTribesMapping (Election election)
     printf("mapCopy in compute function SUCCESS!\n");//debug    
     MAP_FOREACH(areas_iter, election->areas)
     {
+        if(!areas_iter)
+        {
+            printf("inside Compute problem detected in areas_iter!\n");
+        }
         MapResult curr_area_voted = has_voted(election, areas_iter);
         //area has voted
         if(curr_area_voted == MAP_ITEM_ALREADY_EXISTS)
