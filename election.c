@@ -454,6 +454,104 @@ bool votesGetTest (char* area_id, char* tribe_id){
     return(!strcheck1 && !strcheck2);   
 }
 
+//input - Map, returns ptr to the lowest key in map
+static char* mapLowKeyGet(Map map)
+{
+    char* low_key = mapGetFirst(map);
+    assert(!low_key);
+    MAP_FOREACH(iterator, map)
+    {
+        if(strcmp(iterator, low_key) < 0)
+        {
+            low_key = iterator;
+        }
+    }
+    return low_key;
+}
+
+
+//returns MAP_ITEM_ALREADY_EXISTS if area_id has voted in the elections, MAP_ITEM_DOES_NOT_EXIST otherwise
+static MapResult has_voted(Election election, char* areas_iter)
+{
+    if(!election || !areas_iter)
+    {
+        return MAP_NULL_ARGUMENT;
+    }
+    MAP_FOREACH(iterator, election->votes)
+    {
+        char* curr_voter = votesAreaGet(iterator);
+        if(!curr_voter)
+        {
+            return MAP_OUT_OF_MEMORY;
+        }
+        printf("inside has_voted func areas_iter is %s, curr_voter is %s\n", areas_iter, curr_voter);//debug
+        if(strcmp(areas_iter, curr_voter))
+        {
+            free(curr_voter);
+            return MAP_ITEM_ALREADY_EXISTS;
+        }
+        free(curr_voter);
+    }    
+    return MAP_ITEM_DOES_NOT_EXIST;
+}
+
+
+ElectionResult computeResultPerArea(Election election, Map electionFinalResults, char* areas_iter)
+{
+    if(!election || !electionFinalResults || !areas_iter)
+    {
+        return ELECTION_NULL_ARGUMENT;
+    }
+    char* max_vote = NULL;
+    char* max_tribe = NULL;
+    //printf("we are looking for all the votes from area %s\n", areas_iter);
+    MAP_FOREACH(votes_iter, election->votes)
+    {
+        char* curr_area = votesAreaGet(votes_iter);
+        if(!curr_area)
+        {
+            return ELECTION_OUT_OF_MEMORY;
+        }
+        char* curr_tribe = votesTribeGet(votes_iter);
+        if(!curr_tribe)
+        {
+            free(curr_area);
+            return ELECTION_OUT_OF_MEMORY;
+        }
+        char* curr_vote = mapGet(election->votes, votes_iter);
+        assert(curr_vote);        
+        printf("inside computePerArea func areas_iter is %s, curr_area is %s\n", areas_iter, curr_area);//debug
+        if(strcmp(areas_iter, curr_area))
+        {
+            int curr_vote_int = stringToInt(curr_vote);
+            int max_vote_int = stringToInt(max_vote);
+            if(curr_vote_int > max_vote_int)
+            {
+                printf("we detected a new max vote\n");//debug
+                max_vote = curr_vote;
+                max_tribe = curr_tribe;
+            }
+            printf("inside computePerArea func max_tribe is %s, curr_tribe is %s\n", max_tribe, curr_tribe);//debug
+            if((curr_vote_int == max_vote_int) && (strcmp(max_tribe, curr_tribe) > 0))
+            {
+                max_tribe = curr_tribe;
+            }
+        }
+        assert(curr_tribe);
+        free(curr_area);
+        //free(curr_tribe);
+    }
+    MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
+    free(max_vote);
+    free(max_tribe);
+    if (mapPutResult2 != MAP_SUCCESS)
+    {
+        assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
+        return ELECTION_OUT_OF_MEMORY;
+    }
+    return ELECTION_SUCCESS;
+}
+
 
 Map electionComputeAreasToTribesMapping (Election election)
 {
@@ -463,54 +561,33 @@ Map electionComputeAreasToTribesMapping (Election election)
         printf("mapCopy in compute function failed!\n");//debug
         return NULL;
     }
-    printf("mapCopy in compute function SUCCESS!\n");//debug
+    if(!mapGetFirst(election->areas) || !mapGetFirst(election->tribes))
+    {
+        mapDestroy(electionFinalResults);
+        Map empty_map = mapCreate();        
+        return (empty_map ? empty_map : NULL);
+    }
+    printf("mapCopy in compute function SUCCESS!\n");//debug    
     MAP_FOREACH(areas_iter, election->areas)
     {
-        char* max_vote = NULL;
-        char* max_tribe = NULL;
-        printf("we are looking for all the votes from area %s\n", areas_iter);
-        MAP_FOREACH(votes_iter, election->votes)
+        MapResult curr_area_voted = has_voted(election, areas_iter);
+        //area has voted
+        if(curr_area_voted == MAP_ITEM_ALREADY_EXISTS)
         {
-            char* curr_area = votesAreaGet(votes_iter);
-            printf("we see a vote from area %s, while looking for votes from area %s\n", curr_area, areas_iter);
-            if(!curr_area)
+            ElectionResult res = computeResultPerArea(election, electionFinalResults, areas_iter);
+            if((res == ELECTION_OUT_OF_MEMORY) || (res == ELECTION_NULL_ARGUMENT))
             {
+                printf("while computing system is out of memory or detected null argument!\n");//debug
                 mapDestroy(electionFinalResults);
                 return NULL;
             }
-            if(strcmp(areas_iter, curr_area) == 0)
-            {
-                char* curr_vote = mapGet(election->votes, votes_iter);
-                char* curr_tribe = NULL;
-                assert(!curr_vote);
-                printf("Until now the max vote is %s. We just detected that area %s voted %s times\n", max_vote, curr_area, curr_vote);//debug
-                if(stringToInt(curr_vote) > stringToInt(max_vote))
-                {
-                    printf("we detected a new max vote\n");//debug
-                    max_vote = curr_vote;
-                    curr_tribe = votesTribeGet(votes_iter);
-                    if(!curr_tribe)
-                    {
-                        mapDestroy(electionFinalResults);
-                        return NULL;
-                    }
-                    max_tribe = curr_tribe;
-                }
-                if(stringToInt(curr_vote) == stringToInt(max_vote))
-                {                       
-                    if(strcmp(max_tribe, curr_tribe) > 0)
-                    {
-                        max_tribe = curr_tribe;
-                    }
-                }
-            }
         }
-        //no voters in the area
-        if(!max_tribe)
+        //area hasn't voted
+        else
         {
             printf("detected no voters in area %s\n", areas_iter);
-            char* no_voters_str = "00";
-            MapResult mapPutResult1 = mapPut(electionFinalResults, areas_iter, no_voters_str);
+            char* tribe_id_low = mapLowKeyGet(election->tribes);
+            MapResult mapPutResult1 = mapPut(electionFinalResults, areas_iter, tribe_id_low);
             if(mapPutResult1 != MAP_SUCCESS)
             {
                 assert(mapPutResult1 == MAP_OUT_OF_MEMORY);
@@ -518,19 +595,7 @@ Map electionComputeAreasToTribesMapping (Election election)
                 return NULL;
             }
         }
-        //voters exist in the area
-        else
-        {
-            printf("detected votes from an area\n");
-            MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
-            if (mapPutResult2 != MAP_SUCCESS)
-            {
-                assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
-                mapDestroy(electionFinalResults);
-                return NULL;
-            }
-        }
-    }
+    }    
     return electionFinalResults;
 }
 

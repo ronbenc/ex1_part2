@@ -15,4 +15,4 @@ set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 #set(CMAKE_C_STANDARD 99)
 
 # Tell CMake to build an executable named mtm_tot, specifying the comprising file(s)
-add_executable(election mtm_map/map.c election.c election.h mtm_map/map.h tests/matam_election_tests_by_tal.c)
+add_executable(election mtm_map/map.c election.c election.h mtm_map/map.h main.c)

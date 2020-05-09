@@ -5,14 +5,8 @@
 
 
 
-/*void mapPrint(Map map) //debug
-{
-    MAP_FOREACH(iter, map)
-    {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(map, iter));
-    }
-}*/
 
+/*
 bool removalFunc(int area_id)
 {
     return (area_id == 20);
@@ -41,17 +35,13 @@ int main()
     electionDestroy(election);
     return 0;
 }
+*/
 
-/*
-bool remove_func(int area_id)
-{
-    return (area_id == 3);
-    
-}
+//itay's main function 090520 0045
 
->>>>>>> 4c93b10f6b6a2fcedf586bea04cdf0e3f4d5839a
 int main()
 {
+    printf("hello world!\n");
     Election election = electionCreate();
     if(!election){
         return 0;
@@ -68,12 +58,6 @@ int main()
         printf("1st function failed!\n");        
         return 0;
     }
-    areasPrint(election);
-    printf("finished printing areas map after 1st adding\n");
-    tribesPrint(election);
-    printf("finished printing tribes map after 1st adding\n");
-
-
     ElectionResult Add2 = electionAddTribe(election, 2, "kahol lavan");
     if(Add2 == ELECTION_OUT_OF_MEMORY)
     {
@@ -86,11 +70,6 @@ int main()
         electionDestroy(election);
         return 0;
     }
-    areasPrint(election);
-    printf("finished printing areas map after 2nd adding\n");
-    tribesPrint(election);
-    printf("finished printing tribes map after 2nd adding\n");
-
     ElectionResult Add3 = electionAddArea(election, 3, "haifa");
     if(Add3 == ELECTION_OUT_OF_MEMORY)
     {
@@ -103,11 +82,6 @@ int main()
         electionDestroy(election);
         return 0;
     }
-    areasPrint(election);
-    printf("finished printing areas map after 3rd adding\n");
-    tribesPrint(election);
-    printf("finished printing tribes map after 3rd adding\n");
-
     ElectionResult Add4 = electionAddArea(election, 4, "tel aviv");
     if(Add4 == ELECTION_OUT_OF_MEMORY)
     {
@@ -120,10 +94,10 @@ int main()
         electionDestroy(election);
         return 0;
     }
+    printf("printing areas map after adding two areas:\n");
     areasPrint(election);
-    printf("finished printing areas map after 4th adding\n");
+    printf("printing tribes map after adding two tribes:\n");
     tribesPrint(election);
-    printf("finished printing tribes map after 4th adding\n");
 
     ElectionResult Add5 = electionAddVote(election, 3, 1, 4);
     if(Add5 == ELECTION_OUT_OF_MEMORY)
@@ -137,7 +111,6 @@ int main()
         printf("5th function failed!\n");
         return 0;
     }
-
     ElectionResult Add6 = electionAddVote(election, 4, 2, 4);
     if(Add5 == ELECTION_OUT_OF_MEMORY)
     {
@@ -150,15 +123,43 @@ int main()
         printf("6th function failed!\n");
         return 0;
     }
-    printf("printing votes map\n");
+    printf("printing votes map after 2 votes!\n");
     votesPrint(election);
-    electionDestroy(election);
- 
-    return 1;
-}
 
-    //mapPrint(electionComputeAreasToTribesMapping(election));//debug
+    ElectionResult Remove1 = electionRemoveVote(election, 4, 2, 1);
+    if(Remove1 == ELECTION_OUT_OF_MEMORY)
+    {
+        printf("Remove1 = ELECTION_OUT_OF_MEMORY\n");
+        electionDestroy(election);
+        return 0;
+    }
+    if(Remove1 != ELECTION_SUCCESS)
+    {
+        printf("7th function failed!\n");
+        electionDestroy(election);
+        return 0;
+    }
+    printf("printing votes map after 1 remove \n");
+    votesPrint(election);
+    ElectionResult Remove2 = electionRemoveVote(election, 4, 2, 2);
+    if(Remove2 == ELECTION_OUT_OF_MEMORY)
+    {
+        printf("Remove2 = ELECTION_OUT_OF_MEMORY\n");
+        electionDestroy(election);
+        return 0;
+    }
+    if(Remove2 != ELECTION_SUCCESS)
+    {
+        printf("8th function failed!\n");
+        electionDestroy(election);
+        return 0;
+    }
+    
+    printf("printing votes map after 2 removes \n");
+    votesPrint(election);
+    
 
+    printf("computing results!\n");
     Map electionComputeResult = electionComputeAreasToTribesMapping(election);
     if(!electionComputeResult)
     {
@@ -166,9 +167,23 @@ int main()
         return 0;
     }
     printf("printing final results map:\n");
-    mapPrint(electionComputeResult);*/
+    mapPrint(electionComputeResult);
+    mapDestroy(electionComputeResult);
+    electionDestroy(election);
+    return 1;
+}
+
+
+
+/*
+bool remove_func(int area_id)
+{
+    return (area_id == 3);
     
-/*{
+}
+
+
+{
     Election election = electionCreate();
     electionAddTribe(election, 01, "likud");
     electionAddTribe(election, 02, "kahol lavan");

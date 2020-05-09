@@ -53,6 +53,9 @@ void votesPrint(Election election); //debug
 
 void areasPrint(Election election); //debug
 
-void tribePrint(Election election); //debug
+void tribesPrint(Election election); //debug
+
+void mapPrint(Map map);//debug
+
 
 #endif //MTM_ELECTION_H
