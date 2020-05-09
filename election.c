@@ -55,8 +55,8 @@ static bool isNameValid(const char* name)
 static int getIntLength(int num)
 {
     assert(isIdValid(num));
-    int len = 0;
-    while (num>0)
+    int len = 1;
+    while (num>9)
     {
         num/=10;
         len++;
