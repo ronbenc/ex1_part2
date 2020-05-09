@@ -109,7 +109,8 @@ void electionDestroy(Election election) //Ron
 //adds an item to a specified map
 static ElectionResult electionAddItemToMap(Election election, Map map, int item_id, const char* item_name)
 {
-    if(election == NULL || item_name == NULL)
+    assert(election != NULL);
+    if(item_name == NULL)
     {
         return ELECTION_NULL_ARGUMENT;
     }
@@ -161,11 +162,17 @@ static ElectionResult electionAddItemToMap(Election election, Map map, int item_
 
 ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
 {
+    if(election == NULL)
+        return ELECTION_NULL_ARGUMENT;
+
     return electionAddItemToMap(election, election->tribes, tribe_id, tribe_name);
 }
 
 ElectionResult electionAddArea(Election election, int area_id, const char* area_name) //Ron
 {
+    if(election == NULL)
+        return ELECTION_NULL_ARGUMENT;
+
     return electionAddItemToMap(election, election->areas, area_id, area_name);
 }
 
