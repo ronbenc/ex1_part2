@@ -466,7 +466,7 @@ bool votesGetTest (char* area_id, char* tribe_id){
 static char* mapLowKeyGet(Map map)
 {
     char* low_key = mapGetFirst(map);
-    assert(!low_key);
+    assert(low_key);
     MAP_FOREACH(iterator, map)
     {
         if(strcmp(iterator, low_key) < 0)
@@ -550,7 +550,9 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
         //free(curr_tribe);
     }
     MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
+    assert(max_vote != NULL);
     free(max_vote);
+    assert(max_tribe != NULL);
     free(max_tribe);
     if (mapPutResult2 != MAP_SUCCESS)
     {
