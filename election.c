@@ -19,8 +19,8 @@ struct election_t
 static char* votesTribeGet(char* generated_key);
 static char* votesAreaGet(char* generated_key);
 
-//allocates a new string and copies given string data
-static char* copyString(const char* str)
+//allocates a new string and copies given string data. returns NULL if allocation is failed
+static char* copyString(const char* str)// exists in map.c maybe create a utility file
 {
     long int len = strlen(str);
     char* newStr = malloc(len + 1);
@@ -55,8 +55,8 @@ static bool isNameValid(const char* name)
 static int getIntLength(int num)
 {
     assert(isIdValid(num));
-    int len = 0;
-    while (num>0)
+    int len = 1;
+    while (num>9)
     {
         num/=10;
         len++;
@@ -109,7 +109,8 @@ void electionDestroy(Election election) //Ron
 //adds an item to a specified map
 static ElectionResult electionAddItemToMap(Election election, Map map, int item_id, const char* item_name)
 {
-    if(election == NULL || item_name == NULL)
+    assert(election != NULL);
+    if(item_name == NULL)
     {
         return ELECTION_NULL_ARGUMENT;
     }
@@ -161,11 +162,17 @@ static ElectionResult electionAddItemToMap(Election election, Map map, int item_
 
 ElectionResult electionAddTribe (Election election, int tribe_id, const char* tribe_name) //Ron
 {
+    if(election == NULL)
+        return ELECTION_NULL_ARGUMENT;
+
     return electionAddItemToMap(election, election->tribes, tribe_id, tribe_name);
 }
 
 ElectionResult electionAddArea(Election election, int area_id, const char* area_name) //Ron
 {
+    if(election == NULL)
+        return ELECTION_NULL_ARGUMENT;
+
     return electionAddItemToMap(election, election->areas, area_id, area_name);
 }
 
@@ -189,7 +196,8 @@ char* electionGetTribeName (Election election, int tribe_id) //Ron
         return NULL;
     }
     
-    char* tribe_name = copyString(mapGet(election->tribes, str_tribe_id));
+    char* tribe_name = copyString(mapGet(election->tribes, str_tribe_id)); //will return NULL if allocation is failed so no need to check
+
     free(str_tribe_id);
 
     return tribe_name;
