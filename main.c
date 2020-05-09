@@ -41,12 +41,10 @@ int main()
 
 int main()
 {
-    printf("hello world!\n");
     Election election = electionCreate();
     if(!election){
         return 0;
-    }
-    
+    }    
     ElectionResult Add1 = electionAddTribe(election, 1, "likud");
     if(Add1 == ELECTION_OUT_OF_MEMORY)
     {
@@ -55,7 +53,6 @@ int main()
     }    
     if(Add1 != ELECTION_SUCCESS)
     {
-        printf("1st function failed!\n");        
         return 0;
     }
     ElectionResult Add2 = electionAddTribe(election, 2, "kahol lavan");
@@ -66,7 +63,6 @@ int main()
     }
     if(Add2 != ELECTION_SUCCESS)
     {
-        printf("2nd function failed!\n");
         electionDestroy(election);
         return 0;
     }
@@ -78,7 +74,6 @@ int main()
     }
     if(Add3 != ELECTION_SUCCESS)
     {
-        printf("3rd function failed!\n");
         electionDestroy(election);
         return 0;
     }
@@ -90,38 +85,28 @@ int main()
     }
     if(Add4 != ELECTION_SUCCESS)
     {
-        printf("4th function failed!\n");
         electionDestroy(election);
         return 0;
     }
-    printf("printing areas map after adding two areas:\n");
-    areasPrint(election);
-    printf("printing tribes map after adding two tribes:\n");
-    tribesPrint(election);
-
     ElectionResult Add5 = electionAddVote(election, 3, 1, 4);
     if(Add5 == ELECTION_OUT_OF_MEMORY)
     {
-        printf("Add5 = ELECTION_OUT_OF_MEMORY\n");
         electionDestroy(election);
         return 0;
     }
     if(Add5 != ELECTION_SUCCESS) 
     {
-        printf("5th function failed!\n");
         electionDestroy(election);
         return 0;
     }
     ElectionResult Add6 = electionAddVote(election, 4, 2, 4);
     if(Add5 == ELECTION_OUT_OF_MEMORY)
     {
-        printf("Add6 = ELECTION_OUT_OF_MEMORY\n");
         electionDestroy(election);
         return 0;
     }
     if(Add6 != ELECTION_SUCCESS)
     {
-        printf("6th function failed!\n");
         electionDestroy(election);
         return 0;
     }
@@ -131,44 +116,34 @@ int main()
     ElectionResult Remove1 = electionRemoveVote(election, 4, 2, 1);
     if(Remove1 == ELECTION_OUT_OF_MEMORY)
     {
-        printf("Remove1 = ELECTION_OUT_OF_MEMORY\n");
         electionDestroy(election);
         return 0;
     }
     if(Remove1 != ELECTION_SUCCESS)
     {
-        printf("7th function failed!\n");
         electionDestroy(election);
         return 0;
     }
-    printf("printing votes map after 1 remove \n");
-    votesPrint(election);
     ElectionResult Remove2 = electionRemoveVote(election, 4, 2, 2);
     if(Remove2 == ELECTION_OUT_OF_MEMORY)
     {
-        printf("Remove2 = ELECTION_OUT_OF_MEMORY\n");
         electionDestroy(election);
         return 0;
     }
     if(Remove2 != ELECTION_SUCCESS)
     {
-        printf("8th function failed!\n");
         electionDestroy(election);
         return 0;
     }
     
     printf("printing votes map after 2 removes \n");
     votesPrint(election);
-    
-
     printf("computing results!\n");
     Map electionComputeResult = electionComputeAreasToTribesMapping(election);
     if(!electionComputeResult)
     {
-        printf("problem in compute funtion detected!\n");
         return 0;
     }
-    printf("printing final results map:\n");
     mapPrint(electionComputeResult);
     mapDestroy(electionComputeResult);
     electionDestroy(election);
