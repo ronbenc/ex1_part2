@@ -552,9 +552,9 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
     }
     MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
     assert(max_vote != NULL);
-    free(max_vote);
+    //free(max_vote);
     assert(max_tribe != NULL);
-    free(max_tribe);
+    //free(max_tribe);
     if (mapPutResult2 != MAP_SUCCESS)
     {
         assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
