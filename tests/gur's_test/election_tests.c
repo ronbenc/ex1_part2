@@ -705,7 +705,7 @@ bool subComputeSanity(Election sample) {
     ASSERT_TEST(mapGetSize(results) == 6);
     ASSERT_TEST(results);
     ASSERT_TEST(strcmp(mapGet(results, "21"), "12") == 0);
-    mapDestroy(results);
+    mapDestroy(results);\
     electionAddVote(sample, 21, 13, 10);
     results = electionComputeAreasToTribesMapping(sample);
     ASSERT_TEST(mapGetSize(results) == 6);
