@@ -19,8 +19,10 @@ struct election_t
 static char* votesTribeGet(char* generated_key);
 static char* votesAreaGet(char* generated_key);
 
+
+//developers comment: this function exists in map.c aswell. we chose to duplicate it because it's a simple and short function that doesn"t justify a utilty file
 //allocates a new string and copies given string data. returns NULL if allocation is failed
-static char* copyString(const char* str)// exists in map.c maybe create a utility file
+static char* copyString(const char* str)
 {
     long int len = strlen(str);
     char* newStr = malloc(len + 1);
