@@ -16,8 +16,8 @@ struct election_t
     Map votes;
 };
 
-static char* votesTribeGet(char* generated_key);
-static char* votesAreaGet(char* generated_key);
+static char* votesAreaGet(Election election, char* generated_key);
+static char* votesTribeGet(Election election, char* generated_key);
 
 //allocates a new string and copies given string data. returns NULL if allocation is failed
 static char* copyString(const char* str)// exists in map.c maybe create a utility file
@@ -265,7 +265,7 @@ static ElectionResult electionRemoveTribeFromVotes(Election election, const char
         return ELECTION_OUT_OF_MEMORY;
     MAP_FOREACH(key_iterator, iterator_map)
     {
-        char* curr_tribe = votesTribeGet(key_iterator);
+        char* curr_tribe = votesTribeGet(election, key_iterator);
         if(strcmp(curr_tribe, str_tribe_id) == 0)
         {
             mapRemove(election->votes, key_iterator);
@@ -322,7 +322,7 @@ static ElectionResult electionRemoveAreaFromVotes(Election election, const char*
         return ELECTION_OUT_OF_MEMORY;
     MAP_FOREACH(key_iterator, iterator_map)
     {
-        char* curr_area = votesAreaGet(key_iterator);
+        char* curr_area = votesAreaGet(election, key_iterator);
 
         if(strcmp(curr_area, str_area_id) == 0)
         {
@@ -385,8 +385,40 @@ static char* votesAreaGet(char* generated_key)
     return area_id;
 }
 
-//extracts tribe id from a generated key in votes map
-static char* votesTribeGet(char* generated_key)
+//returns a ptr to area_id (as voter) according to given vote
+static char* votesAreaGet(Election election, char* generated_key)
+{
+    Map areasCopy = mapCopy(election->areas);
+    char* ptr = generated_key;
+    int len = 0;
+    while(*ptr != PARTITION_CHAR)
+    {
+        len++;
+        ptr++;
+    }
+    char* area_id = malloc(len*(sizeof(*area_id) + 1));
+    if(!area_id)
+    {
+        return NULL;
+    }
+    area_id[len] = '\0';
+    strncpy(area_id, generated_key, len);
+    MAP_FOREACH(iterator, areasCopy)
+    {
+        if(strcmp(iterator, area_id))
+        {
+            free(area_id);
+            mapDestroy(areasCopy);
+            return iterator;
+        }
+    }
+    free(area_id);
+    mapDestroy(areasCopy);
+    return NULL;
+}
+
+//returns a ptr to tribe_id (as voter) according to given vote
+static char* votesTribeGet(Election election, char* generated_key)
 {
     char* ptr = generated_key;
     int area_len = 0, tribe_len = 0;
@@ -401,14 +433,25 @@ static char* votesTribeGet(char* generated_key)
         tribe_len++;
         ptr++;
     }
-    char* tribe_id = malloc(tribe_len*sizeof(*tribe_id));
+    char* tribe_id = malloc(tribe_len*(sizeof(*tribe_id) + 1));
     if(!tribe_id)
     {
         return NULL;
     }
-    //assert(*(generated_key + area_len + 1 + tribe_len) == "\0");//ptr to end of string
-    //return strncpy(tribe_id, generated_key + area_len + 1, tribe_len + 1); debug
-    return strcpy(tribe_id, generated_key + area_len +1);
+    strcpy(tribe_id, generated_key + area_len + 1);
+    Map tribesCopy = mapCopy(election->tribes);
+    MAP_FOREACH(iterator, election->tribes)
+    {
+        if(strcmp(iterator, tribe_id))
+        {
+            free(tribe_id);
+            mapDestroy(tribesCopy);
+            return iterator;
+        }
+    }
+    mapDestroy(tribesCopy);
+    free(tribe_id);
+    return NULL;
 }
 
 //generates a unique key to votes map, which contains area and tribe voted for
@@ -432,111 +475,113 @@ static char* votesKeyGenerate(char* area_id, char* tribe_id)
     return new_key;
 }
 
-//back to static / remove
-bool votesGetTest (char* area_id, char* tribe_id){
-    char* generated_key = votesKeyGenerate(area_id, tribe_id);
-    char* area_extract = votesAreaGet(generated_key);
-    char* tribe_extract = votesTribeGet(generated_key);
-    bool strcheck1 = strcmp(area_extract, area_id);
-    bool strcheck2 = strcmp(tribe_extract, tribe_id);
-    free(area_extract);
-    free(tribe_extract);
-    free(generated_key);
-    return(!strcheck1 && !strcheck2);   
-}
-
 //input - Map, returns ptr to the lowest key in map
 static char* mapLowKeyGet(Map map)
 {
-    char* low_key = mapGetFirst(map);
+    Map copy = mapCopy(map);
+    char* low_key = mapGetFirst(copy);
     assert(low_key);
-    MAP_FOREACH(iterator, map)
+    MAP_FOREACH(iterator, copy)
     {
         if(strcmp(iterator, low_key) < 0)
         {
             low_key = iterator;
         }
     }
+    mapDestroy(copy);
     return low_key;
+}
+
+//brings ptr to first vote of a given area
+static char* votesGetFirst(Election election, const char* area_id)
+{   
+    Map votesCopy = mapCopy(election->votes);
+    MAP_FOREACH(iterator, votesCopy)
+    {
+        char* curr_area = votesAreaGet(election, iterator);
+        assert(curr_area);
+        if(strcmp(curr_area, area_id))
+        {
+            mapDestroy(votesCopy);
+            return iterator;
+        }
+    }
+    mapDestroy(votesCopy);
+    return NULL;
 }
 
 
 //returns MAP_ITEM_ALREADY_EXISTS if area_id has voted in the elections, MAP_ITEM_DOES_NOT_EXIST otherwise
-static MapResult has_voted(Election election, char* areas_iter)
+static MapResult has_voted(Election election, const char* areas_iter)
 {
     if(!election || !areas_iter)
     {
         return MAP_NULL_ARGUMENT;
     }
-    MAP_FOREACH(iterator, election->votes)
+    Map votesCopy = mapCopy(election->votes);
+    MAP_FOREACH(iterator, votesCopy)
     {
-        char* curr_voter = votesAreaGet(iterator);
-        if(!curr_voter)
-        {
-            return MAP_OUT_OF_MEMORY;
-        }
+        char* curr_voter = votesAreaGet(election, iterator);
+        assert(curr_voter);
         if(strcmp(areas_iter, curr_voter))
         {
-            free(curr_voter);
+            mapDestroy(votesCopy);
             return MAP_ITEM_ALREADY_EXISTS;
         }
-        free(curr_voter);
-    }    
+    }
+    mapDestroy(votesCopy);
     return MAP_ITEM_DOES_NOT_EXIST;
 }
 
 
-ElectionResult computeResultPerArea(Election election, Map electionFinalResults, char* areas_iter)
+ElectionResult computeResultPerArea(Election election, Map electionFinalResults, const char* areas_iter)
 {
     if(!election || !electionFinalResults || !areas_iter)
     {
         return ELECTION_NULL_ARGUMENT;
     }
-    char* max_vote = NULL;
-    char* max_tribe = NULL;
+    char* max_vote = mapGet(election->votes, votesGetFirst(election, areas_iter));//no alloc!
+    char* max_tribe = votesTribeGet(election, votesGetFirst(election, areas_iter));//no alloc!
+    assert(max_tribe);
+    assert(max_vote);
+    printf("looking for all votes from area %s\n", areas_iter);
+    //return ELECTION_ERROR;//debug
     MAP_FOREACH(votes_iter, election->votes)
     {
-        char* curr_area = votesAreaGet(votes_iter);
-        if(!curr_area)
-        {
-            return ELECTION_OUT_OF_MEMORY;
-        }
-        char* curr_tribe = votesTribeGet(votes_iter);
-        if(!curr_tribe)
-        {
-            free(curr_area);
-            return ELECTION_OUT_OF_MEMORY;
-        }
+        printf("votes iterator is %s\n", votes_iter);
+        char* curr_area = votesAreaGet(election, votes_iter);
+        assert(curr_area);
+        char* curr_tribe = votesTribeGet(election, votes_iter);
+        assert(curr_tribe);
         char* curr_vote = mapGet(election->votes, votes_iter);
         assert(curr_vote);        
-        if(strcmp(areas_iter, curr_area))
+        printf("we detected %s votes from area %s to the to tribe %s, while looking for votes from area %s\n", curr_vote, curr_area, curr_tribe, areas_iter);
+        if(strcmp(areas_iter, curr_area) == 0)
         {
+            printf("curr_vote is %s\n", curr_vote);//debug
             int curr_vote_int = stringToInt(curr_vote);
+            printf("max_vote is %s\n", max_vote);//debug
             int max_vote_int = stringToInt(max_vote);
             if(curr_vote_int > max_vote_int)
             {
-                max_vote = curr_vote;
+                max_vote = curr_vote;                
                 max_tribe = curr_tribe;
+                printf("new_max_vote for area %s is %s to tribe %s\n", areas_iter, max_vote, max_tribe);
             }
             if((curr_vote_int == max_vote_int) && (strcmp(max_tribe, curr_tribe) > 0))
             {
                 max_tribe = curr_tribe;
             }
         }
-        assert(curr_tribe);
-        //free(curr_area);
-        //free(curr_tribe);
     }
-    MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
-    assert(max_vote != NULL);
-    //free(max_vote);
-    assert(max_tribe != NULL);
-    //free(max_tribe);
+    printf("detected area %s has voted the most to tribe %s\n", areas_iter, max_tribe);
+    MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);    
     if (mapPutResult2 != MAP_SUCCESS)
     {
-        assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
+        assert(mapPutResult2 == MAP_OUT_OF_MEMORY);        
         return ELECTION_OUT_OF_MEMORY;
     }
+    printf("mapPut SUCCESS!\n");
     return ELECTION_SUCCESS;
 }
 
@@ -550,10 +595,11 @@ Map electionComputeAreasToTribesMapping (Election election)
     }
     if(!mapGetFirst(election->areas) || !mapGetFirst(election->tribes))
     {
-        //mapClear?? itay debug
-        mapDestroy(electionFinalResults);
+        mapClear(electionFinalResults);//debug
+        return electionFinalResults;
+        /*mapDestroy(electionFinalResults);
         Map empty_map = mapCreate();        
-        return (empty_map ? empty_map : NULL);
+        return (empty_map ? empty_map : NULL);*/
     }
     MAP_FOREACH(areas_iter, election->areas)
     {
@@ -562,6 +608,11 @@ Map electionComputeAreasToTribesMapping (Election election)
         if(curr_area_voted == MAP_ITEM_ALREADY_EXISTS)
         {
             ElectionResult res = computeResultPerArea(election, electionFinalResults, areas_iter);
+            /*if(res == ELECTION_ERROR)
+            {
+                printf("gotch'a!\n");
+                return NULL;
+            }*/
             if((res == ELECTION_OUT_OF_MEMORY) || (res == ELECTION_NULL_ARGUMENT))
             {
                 mapDestroy(electionFinalResults);
@@ -586,7 +637,7 @@ Map electionComputeAreasToTribesMapping (Election election)
 
 //checks if all arguments to electionAddVote are valid
 static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id, int tribe_id, int num_of_votes){
-    if(!election || !area_id || !tribe_id){
+    if(!election){
         return ELECTION_NULL_ARGUMENT;
     }
     if(tribe_id < 0 || area_id < 0){
@@ -786,6 +837,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
 
 void areasPrint(Election election) //debug
 {
+    printf("printing areas map\n");
     MAP_FOREACH(iter, election->areas)
     {
         printf("Key: %s |||| Value: %s\n", iter, mapGet(election->areas, iter));
@@ -794,6 +846,7 @@ void areasPrint(Election election) //debug
 
 void tribesPrint(Election election) //debug
 {
+    printf("printing tribes map\n");
     MAP_FOREACH(iter, election->tribes)
     {
         printf("Key: %s |||| Value: %s\n", iter, mapGet(election->tribes, iter));
