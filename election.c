@@ -357,19 +357,22 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
         {
             electionRemoveItemFromMap(election->areas, area_id_iterator);
              if(electionRemoveAreaFromVotes(election, area_id_iterator) == ELECTION_OUT_OF_MEMORY)
-        return ELECTION_OUT_OF_MEMORY;
+             {
+                mapDestroy(iterator_map); 
+                return ELECTION_OUT_OF_MEMORY;
+             }
         }
     }
 
     mapDestroy(iterator_map);
-
     return ELECTION_SUCCESS;
 }
 
-//returns a ptr to area_id (as voter) according to given vote
-static char* votesAreaGet(Election election, char* generated_key)
+
+//string (not pointers) implementation
+//extracts area id from a generated key in votes map
+static char* votesAreaGet(char* generated_key)
 {
-    Map areasCopy = mapCopy(election->areas);
     char* ptr = generated_key;
     int len = 0;
     while(*ptr != PARTITION_CHAR)
@@ -378,47 +381,31 @@ static char* votesAreaGet(Election election, char* generated_key)
         ptr++;
     }
     char* area_id = malloc(len*(sizeof(*area_id) + 1));
+    area_id[len] = '\0';
     if(!area_id)
     {
         return NULL;
     }
-    area_id[len] = '\0';
-    strncpy(area_id, generated_key, len);
-    MAP_FOREACH(iterator, areasCopy)
-    {
-        if(strcmp(iterator, area_id))
-        {
-            free(area_id);
-            mapDestroy(areasCopy);
-            return iterator;
-        }
-    }
-    free(area_id);
-    mapDestroy(areasCopy);
-    return NULL;
+    strncpy(area_id, generated_key, len);   
+    return area_id;
 }
 
-//returns a ptr to tribe_id (as voter) according to given vote
-static char* votesTribeGet(Election election, char* generated_key)
+//extracts tribe id from a generated key in votes map
+static char* votesTribeGet(char* generated_key)
 {
-    //char* ptr = generated_key;
+    char* ptr = generated_key;
     int area_len = 0, tribe_len = 0;
-    char* area = votesAreaGet(election, generated_key);
-    area_len = strlen(votesAreaGet(election, area));
-    // while(*ptr != PARTITION_CHAR)
-    // {
-    //     area_len++;
-    //     ptr++;
-    // }
-    // ptr++;
-    //strlen on votesArea
-    tribe_len = strlen(generated_key) - area_len -1;
-    // ptr+= area_len+1;
-    // while(*ptr != '\0')
-    // {
-    //     tribe_len++;
-    //     ptr++;
-    // }
+    while(*ptr != PARTITION_CHAR)
+    {
+        area_len++;
+        ptr++;
+    }
+    ptr++;
+    while(*ptr != '\0')
+    {
+        tribe_len++;
+        ptr++;
+    }
     char* tribe_id = malloc(tribe_len*(sizeof(*tribe_id) + 1));
     if(!tribe_id)
     {
@@ -472,6 +459,7 @@ static char* mapLowKeyGet(Map map)
     strcpy(low_key, low_key_temp);
     if(!low_key)
     {
+        mapDestroy(copy);
         return NULL;
     }
     mapDestroy(copy);    
@@ -493,18 +481,26 @@ static MapResult has_voted(Election election, const char* areas_iter)
     }
     MAP_FOREACH(iterator, votesCopy)
     {
+        assert(iterator != NULL);
         char* curr_voter = votesAreaGet(iterator);
-        assert(curr_voter);
+        if(curr_voter == NULL)
+        {
+            mapDestroy(votesCopy);
+            return MAP_OUT_OF_MEMORY;
+        }
+            
         if(strcmp(areas_iter, curr_voter))
         {
+            free(curr_voter);
             mapDestroy(votesCopy);
             return MAP_ITEM_ALREADY_EXISTS;
         }
+        free(curr_voter);
     }
+
     mapDestroy(votesCopy);
     return MAP_ITEM_DOES_NOT_EXIST;
 }
-
 
 ElectionResult computeResultPerArea(Election election, Map electionFinalResults, char* areas_iter)
 {
@@ -558,10 +554,18 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
     return ELECTION_SUCCESS;
 }
 
+// static void votesResetVotesToMin(Map electionFinalResults)
+// {
+//     MAP_FOREACH(results_iterator, electionFinalResults)
+//     {
+//         mapPut(electionFinalResults, results_iterator, "0");
+//     }
+// }
 
 Map electionComputeAreasToTribesMapping (Election election)
 {
     Map electionFinalResults = mapCopy(election->areas);
+    // votesResetVotesToMin(electionFinalResults);
     if(!electionFinalResults)
     {
         return NULL;
@@ -599,7 +603,8 @@ Map electionComputeAreasToTribesMapping (Election election)
                 return NULL;
             }
         }
-    }    
+    } 
+    mapDestroy(electionFinalResults);  
     return electionFinalResults;
 }
 
