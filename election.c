@@ -8,6 +8,8 @@
 #define PARTITION_CHAR '_'
 #define NO_VOTES 0
 #define NEGATIVE(x) -1*(x)
+#define ZERO_STR "0"
+#define ZERO_STRLEN 1
 
 struct election_t
 {
@@ -483,16 +485,16 @@ static MapResult has_voted(Election election, const char* areas_iter)
     {
         assert(iterator != NULL);
         char* curr_voter = votesAreaGet(iterator);
-        if(curr_voter == NULL)
+        if(!curr_voter)
         {
             mapDestroy(votesCopy);
             return MAP_OUT_OF_MEMORY;
         }
-            
+         
         if(strcmp(areas_iter, curr_voter))
         {
-            free(curr_voter);
             mapDestroy(votesCopy);
+            free(curr_voter);
             return MAP_ITEM_ALREADY_EXISTS;
         }
         free(curr_voter);
@@ -508,8 +510,11 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
     {
         return ELECTION_NULL_ARGUMENT;
     }
-    char* max_vote = "0";
-    char* max_tribe = "0";
+    char* max_tribe = malloc(sizeof(*max_tribe) * (ZERO_STRLEN + 1));
+    strcpy(max_tribe, ZERO_STR);
+    char* max_vote = malloc(sizeof(*max_vote) * (ZERO_STRLEN + 1));
+    strcpy(max_vote, ZERO_STR);
+    int max_vote_int = stringToInt(max_vote);
     MAP_FOREACH(votes_iter, election->votes)
     {
         char* curr_area = votesAreaGet(votes_iter);
@@ -528,15 +533,39 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
         if(strcmp(areas_iter, curr_area) == 0)
         {
             int curr_vote_int = stringToInt(curr_vote);
-            int max_vote_int = stringToInt(max_vote);
+            //int max_vote_int = stringToInt(max_vote);
             if(curr_vote_int > max_vote_int)
             {
-                max_vote = curr_vote;                
-                max_tribe = curr_tribe;
+                max_vote = realloc(max_vote, strlen(curr_vote) + 1);//debug
+                if(!max_vote)
+                {
+                    free(max_tribe);
+                    free(curr_area);
+                    free(curr_tribe);
+                    return ELECTION_OUT_OF_MEMORY;
+                }
+                strcpy(max_vote, curr_vote);
+                max_tribe = realloc(max_tribe, strlen(curr_tribe) + 1);//debug
+                if(!max_tribe)
+                {
+                    free(max_vote);
+                    free(curr_area);
+                    free(curr_tribe);
+                    return ELECTION_OUT_OF_MEMORY;
+                }
+                strcpy(max_tribe, curr_tribe);
             }
             if((curr_vote_int == max_vote_int) && (strcmp(max_tribe, curr_tribe) > 0))
             {
-                max_tribe = curr_tribe;
+                max_tribe = realloc(max_tribe, strlen(curr_tribe));//debug                
+                if(!max_tribe)
+                {
+                    free(max_vote);
+                    free(curr_area);
+                    free(curr_tribe);
+                    return ELECTION_OUT_OF_MEMORY;
+                }
+                strcpy(max_tribe, curr_tribe);
             }
         }
         assert(curr_tribe);
@@ -544,8 +573,8 @@ ElectionResult computeResultPerArea(Election election, Map electionFinalResults,
         free(curr_tribe);
     }
     MapResult mapPutResult2 = mapPut(electionFinalResults, areas_iter, max_tribe);
-    assert(max_vote);
-    assert(max_tribe);
+    free(max_vote);
+    free(max_tribe);
     if (mapPutResult2 != MAP_SUCCESS)
     {
         assert(mapPutResult2 == MAP_OUT_OF_MEMORY);
