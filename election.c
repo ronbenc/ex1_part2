@@ -6,7 +6,6 @@
 #include <stdbool.h>
 
 #define PARTITION_CHAR '_'
-#define NO_VOTES 0
 #define NEGATIVE(x) -1*(x)
 
 
@@ -258,11 +257,11 @@ static void electionRemoveItemFromMap(Map map, const char* item)
     mapRemove(map, item);
 }
 
-//removes a tribe and its votes from Votes. 
+//removes an item (tribe/area) and its votes from votes. 
 //returns ELECTION_OUT_OF_MEMORY if allocation is failed and ELECTION_SUCCESS if removal is succesful
-static ElectionResult electionRemoveTribeFromVotes(Election election, const char* str_tribe_id)
+static ElectionResult electionRemoveItemFromVotes(Election election, const char* str_item_id, char* (*votesItemGet) (char* votes_key))
 {
-    assert(election != NULL && election->votes != NULL && str_tribe_id != NULL);
+    assert(election != NULL && election->votes != NULL && str_item_id != NULL);
     Map iterator_map = mapCopy(election->votes);
     if(iterator_map == NULL)
     {
@@ -271,14 +270,14 @@ static ElectionResult electionRemoveTribeFromVotes(Election election, const char
 
     MAP_FOREACH(key_iterator, iterator_map)
     {
-        char* curr_tribe = votesTribeGet(key_iterator);
+        char* curr_tribe = votesItemGet(key_iterator);
         if(curr_tribe == NULL)
         {
             mapDestroy(iterator_map);
             return ELECTION_OUT_OF_MEMORY;
         }
 
-        if(strcmp(curr_tribe, str_tribe_id) == 0)
+        if(strcmp(curr_tribe, str_item_id) == 0)
         {
             mapRemove(election->votes, key_iterator);
         }
@@ -292,7 +291,7 @@ static ElectionResult electionRemoveTribeFromVotes(Election election, const char
     return ELECTION_SUCCESS;
 }
 
-ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate to static func
+ElectionResult electionRemoveTribe (Election election, int tribe_id)
 {
     if(election == NULL)
     {
@@ -319,46 +318,12 @@ ElectionResult electionRemoveTribe (Election election, int tribe_id) //Seperate 
     if(election_result == ELECTION_ERROR)
     {
         electionRemoveItemFromMap(election->tribes, str_tribe_id);
-        election_result = electionRemoveTribeFromVotes(election, str_tribe_id);
+        election_result = electionRemoveItemFromVotes(election, str_tribe_id, *votesTribeGet);
     }
 
     free(str_tribe_id);
     assert(election_result != ELECTION_ERROR);
     return election_result;
-}
-
-//removes an Area and its votes from Votes. 
-//returns ELECTION_OUT_OF_MEMORY if allocation is failed and ELECTION_SUCCESS if removal is succesful
-static ElectionResult electionRemoveAreaFromVotes(Election election, const char* str_area_id)
-{
-    assert(election != NULL && election->votes != NULL && str_area_id != NULL);
-    Map iterator_map = mapCopy(election->votes);
-    if(iterator_map == NULL)
-    {
-        return ELECTION_OUT_OF_MEMORY;
-    }
-
-    MAP_FOREACH(key_iterator, iterator_map)
-    {
-        char* curr_area = votesAreaGet(key_iterator);
-        if(curr_area == NULL)
-        {
-            mapDestroy(iterator_map);
-            return ELECTION_OUT_OF_MEMORY;
-        }
-
-        if(strcmp(curr_area, str_area_id) == 0)
-        {
-            mapRemove(election->votes, key_iterator);
-        }
-
-        free(curr_area);
-    }
-
-
-    mapDestroy(iterator_map);
-
-    return ELECTION_SUCCESS;
 }
 
 ElectionResult electionRemoveAreas(Election election, AreaConditionFunction should_delete_area)
@@ -380,7 +345,7 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
         if(should_delete_area(curr_area_id))
         {
             electionRemoveItemFromMap(election->areas, area_id_iterator);
-             if(electionRemoveAreaFromVotes(election, area_id_iterator) == ELECTION_OUT_OF_MEMORY)
+             if(electionRemoveItemFromVotes(election, area_id_iterator, *votesAreaGet) == ELECTION_OUT_OF_MEMORY)
              {
                 mapDestroy(iterator_map); 
                 return ELECTION_OUT_OF_MEMORY;
