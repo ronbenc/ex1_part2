@@ -285,7 +285,6 @@ static ElectionResult electionRemoveItemFromVotes(Election election, const char*
         free(curr_tribe);
     }
 
-
     mapDestroy(iterator_map);
 
     return ELECTION_SUCCESS;
