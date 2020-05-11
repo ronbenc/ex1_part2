@@ -494,7 +494,10 @@ static char* GetMinId(Map map)
     return min_key_str;
 }
 
-Map electionComputeAreasToTribesMapping (Election election)// Ron's version
+// Initializes a map for electionComputeAreasToTribesMapping function.
+// if tribes or areas maps are emty than initializes an empty map. otherwise initializes a map where the keys are area is's and the values are the lowest tribe id.
+//returns NULL if arguments are not valid or allocation fails.
+static Map InitilizeMapForComputeAreasToTribesMapping(Election election)
 {
     if(election == NULL)
     {
@@ -520,6 +523,18 @@ Map electionComputeAreasToTribesMapping (Election election)// Ron's version
     assert(min_tribe_id != NULL);
     
     SetAllValues(results, min_tribe_id); //initialize results map to lowest id tribes
+
+    return results;
+}
+
+Map electionComputeAreasToTribesMapping (Election election)// Ron's version
+{
+    Map results = InitilizeMapForComputeAreasToTribesMapping(election);
+
+    if(results == NULL)
+    {
+        return NULL;
+    }
 
     MAP_FOREACH(votes_key_iterator, election->votes)
     {
