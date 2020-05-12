@@ -266,8 +266,7 @@ ElectionResult electionSetTribeName (Election election, int tribe_id, const char
     if(!isIdValid(tribe_id))
     {
         return ELECTION_INVALID_ID;
-    }
-    
+    }    
     char* str_tribe_id = intToString(tribe_id);
     if(str_tribe_id == NULL)
     {
@@ -410,7 +409,6 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 
 
 //generates a unique key to votes map, which contains area and tribe voted for
-//tests needed
 static char* votesKeyGenerate(char* area_id, char* tribe_id)
 {
     if(!area_id || !tribe_id){
@@ -418,7 +416,7 @@ static char* votesKeyGenerate(char* area_id, char* tribe_id)
     }
     char partition_str[2] = {PARTITION_CHAR,'\0'};
     long long int len = strlen(area_id) + strlen(tribe_id) + strlen(partition_str); //additional partition char & /0
-    char* new_key = malloc(len*sizeof(char) + 1);
+    char* new_key = malloc(len*sizeof(*new_key) + 1);
     if(new_key == NULL)
     {
         return NULL;
@@ -561,15 +559,18 @@ Map electionComputeAreasToTribesMapping (Election election)// Ron's version
     return results;
 }
 
-// //checks if all arguments to electionAddVote are valid
+// //checks if all arguments to electionAddVote / electionRemoveVote are valid
 static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id, int tribe_id, int num_of_votes){
-    if(!election){
+    if(!election)
+    {
         return ELECTION_NULL_ARGUMENT;
     }
-    if(tribe_id < 0 || area_id < 0){
+    if(tribe_id < 0 || area_id < 0)
+    {
         return ELECTION_INVALID_ID;
     }
-    if(num_of_votes <= 0){
+    if(num_of_votes <= 0)
+    {
         return ELECTION_INVALID_VOTES;
     }
     char* area_id_str = intToString(area_id);
@@ -577,7 +578,8 @@ static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id,
     {
         return ELECTION_OUT_OF_MEMORY;
     }
-    if(!mapContains(election->areas, area_id_str)){
+    if(!mapContains(election->areas, area_id_str))
+    {
         free(area_id_str);
         return ELECTION_AREA_NOT_EXIST;
     }
@@ -587,7 +589,8 @@ static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id,
         free(area_id_str);
         return ELECTION_OUT_OF_MEMORY;
     }
-    if(!mapContains(election->tribes, tribe_id_str)){
+    if(!mapContains(election->tribes, tribe_id_str))
+    {
         free(area_id_str);
         free(tribe_id_str);
         return ELECTION_TRIBE_NOT_EXIST;
@@ -597,8 +600,7 @@ static ElectionResult electionVoteUpdateArgCheck(Election election, int area_id,
     return ELECTION_SUCCESS;
 }
 
-// //updating number of votes of a certain area to a certain tribe
-// //tests needed - Itay
+//updating number of votes of a certain area to a certain tribe in votes map
 static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_votes)
 {
     assert(election->votes && curr_key && num_of_votes);//number of votes must not be zero (can be negative)
@@ -617,7 +619,7 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
         MapResult mapRemoveResult = mapRemove(election->votes, curr_key);
         if(mapRemoveResult != MAP_SUCCESS)
         {
-            return ELECTION_ERROR;//itay
+            return ELECTION_ERROR;
         }
         return ELECTION_SUCCESS;
     }
@@ -637,7 +639,6 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
     return ELECTION_SUCCESS;
 }
 
-//tests needed
 ElectionResult electionAddVote (Election election, int area_id, int tribe_id, int num_of_votes)
 {
     ElectionResult argCheckResult = electionVoteUpdateArgCheck(election, area_id, tribe_id, num_of_votes);
@@ -667,7 +668,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
         free(tribe_id_str);
         return ELECTION_OUT_OF_MEMORY;
     }
-    assert(election->votes && curr_key && num_of_votes); //supposed to be valid       
+    assert(election->votes && curr_key && num_of_votes);
     if(mapContains(election->votes, curr_key))
     {
         ElectionResult updateSuccess = votesUpdate(election, curr_key, num_of_votes);
@@ -676,7 +677,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
             free(area_id_str);
             free(tribe_id_str);
             free(curr_key);
-            return ELECTION_OUT_OF_MEMORY;//DEBUG!!!!
+            return ELECTION_OUT_OF_MEMORY;
         }
         else
         {
@@ -696,7 +697,7 @@ ElectionResult electionAddVote (Election election, int area_id, int tribe_id, in
             return ELECTION_OUT_OF_MEMORY;
         }
         assert(election->votes && curr_key && toAdd);
-        MapResult mapPutResult = mapPut(election->votes, curr_key, toAdd);//debug change
+        MapResult mapPutResult = mapPut(election->votes, curr_key, toAdd);
         if(mapPutResult != MAP_SUCCESS){
             free(area_id_str);
             free(tribe_id_str);
@@ -742,7 +743,7 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
         free(tribe_id_str);
         return ELECTION_OUT_OF_MEMORY;
     }
-    assert(election->votes && curr_key && num_of_votes); //supposed to be valid
+    assert(election->votes && curr_key && num_of_votes);
     if(mapContains(election->votes, curr_key))
     {
         ElectionResult votesUpdateResult = votesUpdate(election, curr_key, NEGATIVE(num_of_votes));
