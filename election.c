@@ -680,7 +680,6 @@ static ElectionResult votesUpdate(Election election, char* curr_key, int num_of_
         MapResult mapRemoveResult = mapRemove(election->votes, curr_key);
         if(mapRemoveResult != MAP_SUCCESS)
         {
-            printf("error detected in call to mapRemove!\n");//debug
             return ELECTION_ERROR;//itay
         }
         return ELECTION_SUCCESS;
