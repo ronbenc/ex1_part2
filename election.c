@@ -1,5 +1,4 @@
 #include "election.h"
-//#include "mtm_map/map.h"
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -9,15 +8,18 @@
 #define NEGATIVE(x) -1*(x)
 
 
+/*developers comment: we decided to implement tribes and areas using Map with casting string to int.
+votes stores the data of the number of votes from a certain area to a certain tribe. 
+votes is a map where the key include a combination of an area in and a tribe id and the value is the number of votes.
+we decided to implement votes using a map because it was already written and we wanted to use the existing moduls instead of creating a new one.
+we considered using votes as a seperated module, but after a trade-off we made, we decided to implement votes in election.c for simplicty considerations.*/
+
 struct election_t
 {
     Map tribes;
     Map areas;
     Map votes;
 };
-
-static char* votesTribeGet(char* generated_key);
-static char* votesAreaGet(char* generated_key);
 
 
 //developers comment: this function exists in map.c aswell. we chose to duplicate it because it's a simple and short function that doesn"t justify a utilty file
@@ -46,7 +48,10 @@ static bool isNameValid(const char* name)
     while (name[0] != 0)
     {
         if((name[0] < 'a' || name[0] > 'z') && (name[0] != ' '))
+        {
             return false;
+        }
+        
         name++;
     }
     
@@ -82,7 +87,53 @@ static int stringToInt(const char* str){
     return atoi(str);
 }
 
-Election electionCreate() //Ron
+//extracts area id from a generated key in votes map
+static char* votesAreaGet(char* generated_key)
+{
+    char* ptr = generated_key;
+    int len = 0;
+    while(*ptr != PARTITION_CHAR)
+    {
+        len++;
+        ptr++;
+    }
+    char* area_id = malloc(len*(sizeof(*area_id) + 1));
+    area_id[len] = '\0';
+    if(!area_id)
+    {
+        return NULL;
+    }
+    strncpy(area_id, generated_key, len);   
+    return area_id;
+}
+
+//extracts tribe id from a generated key in votes map
+static char* votesTribeGet(char* generated_key)
+{
+    char* ptr = generated_key;
+    int area_len = 0, tribe_len = 0;
+    while(*ptr != PARTITION_CHAR)
+    {
+        area_len++;
+        ptr++;
+    }
+    ptr++;
+    while(*ptr != '\0')
+    {
+        tribe_len++;
+        ptr++;
+    }
+    char* tribe_id = malloc(tribe_len*(sizeof(*tribe_id) + 1));
+    if(!tribe_id)
+    {
+        return NULL;
+    }
+
+    return strcpy(tribe_id, generated_key + area_len +1);
+}
+
+
+Election electionCreate()
 {
     Election election = malloc(sizeof(*election));
     if(election == NULL)
@@ -100,7 +151,7 @@ Election electionCreate() //Ron
     return election;
 }
 
-void electionDestroy(Election election) //Ron
+void electionDestroy(Election election) 
 {
     mapDestroy(election->tribes);
     mapDestroy(election->areas);
@@ -357,52 +408,6 @@ ElectionResult electionRemoveAreas(Election election, AreaConditionFunction shou
 }
 
 
-//string (not pointers) implementation
-//extracts area id from a generated key in votes map
-static char* votesAreaGet(char* generated_key)
-{
-    char* ptr = generated_key;
-    int len = 0;
-    while(*ptr != PARTITION_CHAR)
-    {
-        len++;
-        ptr++;
-    }
-    char* area_id = malloc(len*(sizeof(*area_id) + 1));
-    area_id[len] = '\0';
-    if(!area_id)
-    {
-        return NULL;
-    }
-    strncpy(area_id, generated_key, len);   
-    return area_id;
-}
-
-//extracts tribe id from a generated key in votes map
-static char* votesTribeGet(char* generated_key)
-{
-    char* ptr = generated_key;
-    int area_len = 0, tribe_len = 0;
-    while(*ptr != PARTITION_CHAR)
-    {
-        area_len++;
-        ptr++;
-    }
-    ptr++;
-    while(*ptr != '\0')
-    {
-        tribe_len++;
-        ptr++;
-    }
-    char* tribe_id = malloc(tribe_len*(sizeof(*tribe_id) + 1));
-    if(!tribe_id)
-    {
-        return NULL;
-    }
-    //assert(*(generated_key + area_len + 1 + tribe_len) == "\0");//ptr to end of string
-    //return strncpy(tribe_id, generated_key + area_len + 1, tribe_len + 1); debug
-    return strcpy(tribe_id, generated_key + area_len +1);
-}
 
 //generates a unique key to votes map, which contains area and tribe voted for
 //tests needed
@@ -752,39 +757,5 @@ ElectionResult electionRemoveVote(Election election, int area_id, int tribe_id, 
         free(tribe_id_str);
         free(curr_key);
         return ELECTION_SUCCESS;
-    }
-}
-
-void areasPrint(Election election) //debug
-{
-    printf("printing areas map\n");
-    MAP_FOREACH(iter, election->areas)
-    {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->areas, iter));
-    }
-}
-
-void tribesPrint(Election election) //debug
-{
-    printf("printing tribes map\n");
-    MAP_FOREACH(iter, election->tribes)
-    {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->tribes, iter));
-    }
-}
-
-void votesPrint(Election election) //debug
-{
-    MAP_FOREACH(iter, election->votes)
-    {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(election->votes, iter));
-    }
-}
-
-void mapPrint(Map map) //debug
-{
-    MAP_FOREACH(iter, map)
-    {
-        printf("Key: %s |||| Value: %s\n", iter, mapGet(map, iter));
     }
 }
